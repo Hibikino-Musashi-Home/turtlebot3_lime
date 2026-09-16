@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 #
 # Copyright 2022 ROBOTIS CO., LTD.
+# Copyright 2026 Hibikino-Musashi@Home
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,65 +16,106 @@
 # limitations under the License.
 #
 # Author: Darby Lim
-
-import os
+# Modified Contents:
+#   - Replace base.launch.py with separate robot state publisher and controller spawner launches.
+#   - Start ros2_control_node with the controller configuration from turtlebot3_lime_hardware.
+#   - Fix fake hardware mode, default fake_sensor_commands to false, and remove the Raspberry Pi check.
+#   - Remove the start_rviz, prefix, and use_fake_hardware launch arguments.
+# Modified Maintainers: Tomoaki Fujino
 
 from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument
 from launch.actions import IncludeLaunchDescription
 from launch.launch_description_sources import PythonLaunchDescriptionSource
+from launch.substitutions import Command
+from launch.substitutions import FindExecutable
 from launch.substitutions import LaunchConfiguration
+from launch.substitutions import PathJoinSubstitution
 from launch.substitutions import ThisLaunchFileDir
-
-
-def is_valid_to_launch():
-    # Path includes model name of Raspberry Pi series
-    path = '/sys/firmware/devicetree/base/model'
-    if os.path.exists(path):
-        return False
-    else:
-        return True
+from launch_ros.actions import Node
+from launch_ros.substitutions import FindPackageShare
 
 
 def generate_launch_description():
-    if not is_valid_to_launch():
-        print('Can not launch fake robot in Raspberry Pi')
-        return LaunchDescription([])
+    ld = LaunchDescription()
 
-    start_rviz = LaunchConfiguration('start_rviz')
-    prefix = LaunchConfiguration('prefix')
-    use_fake_hardware = LaunchConfiguration('use_fake_hardware')
+    # Launch Configurations
     fake_sensor_commands = LaunchConfiguration('fake_sensor_commands')
 
-    return LaunchDescription([
-        DeclareLaunchArgument(
-            'start_rviz',
-            default_value='true',
-            description='Whether execute rviz2'),
+    # Launch Arguments
+    declare_fake_sensor_commands = DeclareLaunchArgument(
+        'fake_sensor_commands',
+        default_value='false',
+        description='Enable fake command interfaces for sensors.',
+    )
 
-        DeclareLaunchArgument(
-            'prefix',
-            default_value='""',
-            description='Prefix of the joint and link names'),
+    ld.add_action(declare_fake_sensor_commands)
 
-        DeclareLaunchArgument(
-            'use_fake_hardware',
-            default_value='true',
-            description='Start robot with fake hardware mirroring command to its states.'),
+    urdf_file = Command(
+        [
+            PathJoinSubstitution([FindExecutable(name='xacro')]),
+            ' ',
+            PathJoinSubstitution(
+                [
+                    FindPackageShare('turtlebot3_lime_description'),
+                    'urdf',
+                    'turtlebot3_lime.urdf.xacro',
+                ]
+            ),
+            ' ',
+            'use_gazebo:=false',
+            ' ',
+            'use_fake_hardware:=true',
+            ' ',
+            'fake_sensor_commands:=',
+            fake_sensor_commands,
+        ]
+    )
 
-        DeclareLaunchArgument(
-            'fake_sensor_commands',
-            default_value='true',
-            description='Enable fake command interfaces for sensors used for simple simulations. \
-            Used only if "use_fake_hardware" parameter is true.'),
+    controller_manager_config = PathJoinSubstitution(
+        [
+            FindPackageShare('turtlebot3_lime_hardware'),
+            'config',
+            'hardware_controller_manager.yaml',
+        ]
+    )
 
-        IncludeLaunchDescription(
-            PythonLaunchDescriptionSource([ThisLaunchFileDir(), '/base.launch.py']),
-            launch_arguments={
-                'start_rviz': start_rviz,
-                'prefix': prefix,
-                'use_fake_hardware': use_fake_hardware,
-                'fake_sensor_commands': fake_sensor_commands,
-            }.items(),
-        )
-    ])
+    robot_state_publisher_launch = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(
+            [
+                ThisLaunchFileDir(),
+                '/robot_state_publisher.launch.py',
+            ]
+        ),
+        launch_arguments={
+            'use_gazebo': 'false',
+            'use_fake_hardware': 'true',
+            'fake_sensor_commands': fake_sensor_commands,
+            'use_sim_time': 'false',
+        }.items(),
+    )
+
+    control_node = Node(
+        package='controller_manager',
+        executable='ros2_control_node',
+        parameters=[
+            {'robot_description': urdf_file},
+            controller_manager_config,
+        ],
+        output='both',
+    )
+
+    controller_spawner_launch = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(
+            [
+                ThisLaunchFileDir(),
+                '/controller_spawner.launch.py',
+            ]
+        ),
+    )
+
+    ld.add_action(robot_state_publisher_launch)
+    ld.add_action(control_node)
+    ld.add_action(controller_spawner_launch)
+
+    return ld

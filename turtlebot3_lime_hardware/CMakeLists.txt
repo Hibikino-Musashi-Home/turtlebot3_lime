@@ -21,6 +21,7 @@ find_package(dynamixel_sdk REQUIRED)
 find_package(hardware_interface REQUIRED)
 find_package(pluginlib REQUIRED)
 find_package(rclcpp REQUIRED)
+find_package(rclcpp_lifecycle REQUIRED)
 
 add_library(${PROJECT_NAME} SHARED
   src/dynamixel_sdk_wrapper.cpp
@@ -33,6 +34,7 @@ ament_target_dependencies(${PROJECT_NAME}
   hardware_interface
   pluginlib
   rclcpp
+  rclcpp_lifecycle
 )
 
 target_include_directories(${PROJECT_NAME}
@@ -48,6 +50,11 @@ pluginlib_export_plugin_description_file(hardware_interface turtlebot3_lime_hard
 ################################################################################
 install(DIRECTORY include/
   DESTINATION include
+)
+
+install(
+  DIRECTORY config
+  DESTINATION share/${PROJECT_NAME}
 )
 
 install(TARGETS ${PROJECT_NAME}
@@ -67,6 +74,7 @@ ament_export_dependencies(
   hardware_interface
   pluginlib
   rclcpp
+  rclcpp_lifecycle
 )
 
 ament_package()

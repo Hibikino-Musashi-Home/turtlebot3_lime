@@ -13,11 +13,10 @@ find_package(ament_cmake REQUIRED)
 # Install
 ################################################################################
 install(
-  DIRECTORY launch config rviz worlds
+  DIRECTORY launch
   DESTINATION share/${PROJECT_NAME}
 )
 
-ament_environment_hooks("${CMAKE_CURRENT_SOURCE_DIR}/env-hooks/${PROJECT_NAME}.dsv.in")
 ################################################################################
 # Macro for ament package
 ################################################################################

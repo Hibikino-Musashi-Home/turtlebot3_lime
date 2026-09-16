@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 #
 # Copyright 2022 ROBOTIS CO., LTD.
+# Copyright 2026 Hibikino-Musashi@Home
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -17,34 +18,39 @@
 # Author: Darby Lim
 # Modified Contents: Add Rviz2 launch file
 # Modified Authors: Keisuke Nagashima
+# Modified Contents:
+#   - Pass the use_sim_time launch configuration to the RViz node.
+#   - Add the use_rviz launch argument declaration.
+# Modified Maintainers: Fujino Tomoaki
 
 from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument
-from launch.conditions import IfCondition
 from launch.substitutions import LaunchConfiguration
 from launch.substitutions import PathJoinSubstitution
-from launch.substitutions import ThisLaunchFileDir
-from launch.actions import IncludeLaunchDescription
-from launch.launch_description_sources import PythonLaunchDescriptionSource
-
 from launch_ros.actions import Node
 from launch_ros.substitutions import FindPackageShare
 
 
 def generate_launch_description():
+    use_sim_time = LaunchConfiguration('use_sim_time')
+
     rviz_config_file = PathJoinSubstitution(
-        [
-            FindPackageShare('turtlebot3_lime_cartographer'),
-            'rviz',
-            'cartographer.rviz'
-        ]
+        [FindPackageShare('turtlebot3_lime_cartographer'), 'rviz', 'cartographer.rviz']
     )
 
-    return LaunchDescription([
-        Node(
-            package='rviz2',
-            executable='rviz2',
-            arguments=['-d', rviz_config_file],
-            output='screen'
-        )
-    ])
+    return LaunchDescription(
+        [
+            DeclareLaunchArgument(
+                'use_rviz',
+                default_value='true',
+                description='Whether execute rviz2',
+            ),
+            Node(
+                package='rviz2',
+                executable='rviz2',
+                arguments=['-d', rviz_config_file],
+                parameters=[{'use_sim_time': use_sim_time}],
+                output='screen',
+            ),
+        ]
+    )

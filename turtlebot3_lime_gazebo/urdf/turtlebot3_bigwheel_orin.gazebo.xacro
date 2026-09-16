@@ -1,0 +1,62 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+  <xacro:include
+    filename="$(find turtlebot3_lime_gazebo)/urdf/sensors/imu.gazebo.xacro" />
+
+  <xacro:include
+    filename="$(find turtlebot3_lime_gazebo)/urdf/sensors/lidar.gazebo.xacro" />
+
+  <xacro:include
+    filename="$(find turtlebot3_lime_gazebo)/urdf/sensors/rgbd_camera.gazebo.xacro" />
+
+  <xacro:macro name="turtlebot3_bigwheel_orin_gazebo" params="prefix">
+
+    <gazebo reference="${prefix}base_link">
+      <material>Gazebo/DarkGrey</material>
+    </gazebo>
+
+    <gazebo reference="${prefix}wheel_left_link">
+      <mu1>1.0</mu1>
+      <mu2>1.0</mu2>
+      <material>
+        <ambient>0.0 0.8 0.0 1.0</ambient>
+        <diffuse>0.0 0.8 0.0 1.0</diffuse>
+        <specular>0.1 0.1 0.1 1.0</specular>
+      </material>
+    </gazebo>
+
+    <gazebo reference="${prefix}wheel_right_link">
+      <mu1>1.0</mu1>
+      <mu2>1.0</mu2>
+      <material>
+        <ambient>0.0 0.8 0.0 1.0</ambient>
+        <diffuse>0.0 0.8 0.0 1.0</diffuse>
+        <specular>0.1 0.1 0.1 1.0</specular>
+      </material>
+    </gazebo>
+
+    <gazebo reference="${prefix}caster_back_right_link">
+      <mu1>0.1</mu1>
+      <mu2>0.1</mu2>
+      <material>Gazebo/FlatBlack</material>
+    </gazebo>
+
+    <gazebo reference="${prefix}caster_back_left_link">
+      <mu1>0.1</mu1>
+      <mu2>0.1</mu2>
+      <material>Gazebo/FlatBlack</material>
+    </gazebo>
+
+    <xacro:turtlebot3_lime_imu_gazebo
+      prefix="${prefix}" />
+
+    <xacro:turtlebot3_lime_lidar_gazebo
+      prefix="${prefix}" />
+
+    <xacro:turtlebot3_lime_rgbd_camera_gazebo
+      prefix="${prefix}" />
+
+  </xacro:macro>
+
+</robot>

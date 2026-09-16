@@ -1,0 +1,42 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+  <xacro:macro name="open_manipulator_sara_gazebo" params="prefix">
+
+    <xacro:macro name="Link" params="reference">
+      <gazebo reference="${reference}">
+        <material>Gazebo/DarkGrey</material>
+      </gazebo>
+    </xacro:macro>
+
+    <xacro:Link reference="${prefix}link1"/>
+    <xacro:Link reference="${prefix}link2"/>
+    <xacro:Link reference="${prefix}link3"/>
+    <xacro:Link reference="${prefix}link4"/>
+    <xacro:Link reference="${prefix}link5"/>
+    <xacro:Link reference="${prefix}link6"/>
+    <xacro:Link reference="${prefix}link7"/>
+
+    <xacro:Link reference="${prefix}gripper_left_link"/>
+    <xacro:Link reference="${prefix}gripper_right_link"/>
+
+
+    <gazebo reference="${prefix}link1">
+      <material>Gazebo/Green</material>
+    </gazebo>
+
+    <gazebo reference="${prefix}link3">
+      <material>Gazebo/Green</material>
+    </gazebo>
+
+    <gazebo reference="${prefix}link5">
+      <material>Gazebo/Green</material>
+    </gazebo>
+
+    <gazebo reference="${prefix}end_effector_link">
+      <material>Gazebo/Red</material>
+    </gazebo>
+
+  </xacro:macro>
+
+</robot>

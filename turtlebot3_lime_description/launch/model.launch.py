@@ -62,8 +62,11 @@ def generate_launch_description():
             'prefix:=',
             prefix,
             ' ',
-            'use_fake_hardware:=',
-            'False',
+            'use_gazebo:=false',
+            ' ',
+            'use_fake_hardware:=true',
+            ' ',
+            'fake_sensor_commands:=false',
         ]
     )
 
@@ -78,7 +81,7 @@ def generate_launch_description():
     return LaunchDescription([
         DeclareLaunchArgument(
             'prefix',
-            default_value='""',
+            default_value='',
             description='Prefix of the joint and link names'),
 
         DeclareLaunchArgument(

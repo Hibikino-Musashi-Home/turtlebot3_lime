@@ -26,7 +26,7 @@ https://github.com/ROBOTIS-GIT/turtlebot3/blob/kinetic-devel/turtlebot3_descript
         <geometry>
           <mesh filename="${meshes_file_direction}/base.stl" scale="0.001 0.001 0.001"/>
         </geometry>
-        <material name="light_black"/>
+        <material name="black"/>
       </visual>
 
       <collision>
@@ -59,7 +59,7 @@ https://github.com/ROBOTIS-GIT/turtlebot3/blob/kinetic-devel/turtlebot3_descript
         <geometry>
           <mesh filename="${meshes_file_direction}/tire.stl" scale="0.001 0.001 0.001"/>
         </geometry>
-        <material name="dark"/>
+        <material name="green"/>
       </visual>
 
       <collision>
@@ -91,7 +91,7 @@ https://github.com/ROBOTIS-GIT/turtlebot3/blob/kinetic-devel/turtlebot3_descript
         <geometry>
           <mesh filename="${meshes_file_direction}/tire.stl" scale="0.001 0.001 0.001"/>
         </geometry>
-        <material name="dark"/>
+        <material name="green"/>
       </visual>
 
       <collision>
@@ -125,7 +125,7 @@ https://github.com/ROBOTIS-GIT/turtlebot3/blob/kinetic-devel/turtlebot3_descript
         <geometry>
           <sphere radius="0.005"/>
         </geometry>
-        <material name="dark"/>
+        <material name="black"/>
       </visual>
 
       <inertial>
@@ -152,7 +152,7 @@ https://github.com/ROBOTIS-GIT/turtlebot3/blob/kinetic-devel/turtlebot3_descript
         <geometry>
           <sphere radius="0.005"/>
         </geometry>
-        <material name="dark"/>
+        <material name="black"/>
       </visual>
 
       <inertial>
@@ -182,7 +182,7 @@ https://github.com/ROBOTIS-GIT/turtlebot3/blob/kinetic-devel/turtlebot3_descript
         <geometry>
           <mesh filename="${meshes_file_direction}/ladar.stl" scale="0.001 0.001 0.001"/>
         </geometry>
-        <material name="dark"/>
+        <material name="black"/>
       </visual>
 
       <collision>

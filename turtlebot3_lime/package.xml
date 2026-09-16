@@ -17,6 +17,7 @@
   <exec_depend>turtlebot3_lime_bringup</exec_depend>
   <exec_depend>turtlebot3_lime_cartographer</exec_depend>
   <exec_depend>turtlebot3_lime_description</exec_depend>
+  <exec_depend>turtlebot3_lime_gazebo</exec_depend>
   <exec_depend>turtlebot3_lime_hardware</exec_depend>
   <exec_depend>turtlebot3_lime_moveit_config</exec_depend>
   <exec_depend>turtlebot3_lime_navigation2</exec_depend>

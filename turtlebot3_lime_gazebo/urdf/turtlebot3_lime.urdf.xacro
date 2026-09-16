@@ -1,0 +1,52 @@
+<?xml version="1.0"?>
+<!-- TurtleBot3 Lime -->
+<robot name="turtlebot3_lime"
+  xmlns:xacro="http://www.ros.org/wiki/xacro">
+  <xacro:arg name="prefix" default="" />
+
+  <!-- Import materials macro -->
+  <xacro:include filename="$(find turtlebot3_lime_description)/urdf/materials.urdf.xacro" />
+
+  <!-- Include TurtleBot3 BigWheel Orin URDF macro -->
+  <xacro:include
+    filename="$(find turtlebot3_lime_description)/urdf/turtlebot3_bigwheel_orin.urdf.xacro" />
+
+  <!-- Include OpenManipulator-X urdf macro -->
+  <xacro:include
+    filename="$(find turtlebot3_lime_description)/urdf/open_manipulator_sara.urdf.xacro" />
+
+  <!-- Include TurtleBot3 Lime System urdf macro -->
+  <xacro:include
+    filename="$(find turtlebot3_lime_description)/urdf/control/turtlebot3_lime_system.ros2_control.xacro" />
+
+  <!-- Include TurtleBot3 BigWheel Orin Gazebo macro -->
+  <xacro:include
+    filename="$(find turtlebot3_lime_gazebo)/urdf/turtlebot3_bigwheel_orin.gazebo.xacro" />
+
+  <!-- Include OpenManipulator SARA Gazebo macro -->
+  <xacro:include filename="$(find turtlebot3_lime_gazebo)/urdf/open_manipulator_sara.gazebo.xacro" />
+
+  <xacro:turtlebot3_bigwheel_orin prefix="$(arg prefix)" />
+
+  <!-- Fixed joint between the mobile base and manipulator -->
+  <joint name="$(arg prefix)base_fixed" type="fixed">
+    <parent link="$(arg prefix)base_link" />
+    <child link="$(arg prefix)link1" />
+    <origin xyz="-0.036 0.0 0.07" rpy="0 0 0" />
+  </joint>
+
+  <!-- Reduced simulation friction: effort limits are 1 N m (arm) and 1 N (gripper). -->
+  <xacro:open_manipulator_sara prefix="$(arg prefix)" arm_friction="0.01" gripper_friction="0.01" />
+
+  <xacro:turtlebot3_bigwheel_orin_gazebo prefix="$(arg prefix)" />
+
+  <xacro:open_manipulator_sara_gazebo prefix="$(arg prefix)" />
+
+  <xacro:turtlebot3_lime_system
+    name="TurtleBot3LimeSystem"
+    prefix="$(arg prefix)"
+    use_gazebo="true"
+    use_fake_hardware="false"
+    fake_sensor_commands="false" />
+
+</robot>

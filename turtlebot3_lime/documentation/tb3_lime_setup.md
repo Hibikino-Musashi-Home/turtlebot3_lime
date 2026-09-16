@@ -2,29 +2,29 @@
 
 ![TB3 Lime](./img/bg.png)
 
-## Gazebo環境での動作検証
+## Gazebo 環境での動作検証
 
-|                     Gazebo環境 + Rviz                      |
+|                     Gazebo 環境 + Rviz                      |
 | :--------------------------------------------------------: |
 | ![moveit_navigation](./img/moveit_navigation.gif?raw=true) |
 
 ## セットアップ手順（Quick Start Guide）
 
-Limeのベースである[TurtleBot3 with OpenMANIPULATOR](https://emanual.robotis.com/docs/en/platform/turtlebot3/manipulation/)から変更点があります．以下の手順を参考にしてください．
+Lime のベースである [TurtleBot3 with OpenMANIPULATOR](https://emanual.robotis.com/docs/en/platform/turtlebot3/manipulation/) から変更点があります．以下の手順を参考にしてください．
 
 ### 1. Jetson Orin Nano の環境設定
 
 #### 1.1. Jetson Orin Nano のセットアップについて
 
-Turtlebot3 Limeを利用するには，Jetson Orin NanoにJetpack 6.xをインストールする必要があります．
+Turtlebot3 Lime を利用するには，Jetson Orin Nano に Jetpack 6.x をインストールする必要があります．
 
-1. Ubuntu 22.04がインストールされたPC（以下，リモートPC）を用意してください．
-2. [SDK Manager](https://developer.nvidia.com/sdk-manager)をインストールしてください．
-3. [公式のインストールガイド](https://docs.nvidia.com/sdk-manager/install-with-sdkm-jetson/index.html)に従って，Jetpack 6.xをインストールしてください．
+1. Ubuntu 22.04 がインストールされた PC（以下，リモート PC）を用意してください．
+2. [SDK Manager](https://developer.nvidia.com/sdk-manager) をインストールしてください．
+3. [公式のインストールガイド](https://docs.nvidia.com/sdk-manager/install-with-sdkm-jetson/index.html) に従って，Jetpack 6.x をインストールしてください．
 
 #### 1.2. ROS 2 Humble のインストール
 
-[ROS 公式のインストールガイド](https://docs.ros.org/en/humble/Installation/Ubuntu-Install-Debians.html)に従って，ROS 2 Humbleをインストールします．
+[ROS 公式のインストールガイド](https://docs.ros.org/en/humble/Installation/Ubuntu-Install-Debians.html) に従って，ROS 2 Humble をインストールします．
 
 まず，Ubuntu Universe リポジトリが有効になっていることを確認します．
 
@@ -33,7 +33,7 @@ sudo apt install -y software-properties-common
 sudo add-apt-repository universe
 ```
 
-ROS 2 Humbleをインストールします．
+ROS 2 Humble をインストールします．
 
 ```bash
 sudo apt update && sudo apt -y install curl gnupg lsb-release
@@ -53,7 +53,7 @@ mkdir -p ~/turtlebot3_ws/src
 cd ~/turtlebot3_ws && colcon build --symlink-install && . install/setup.bash
 ```
 
-ワークスペースやROS_DOMAINを設定します．
+ワークスペースや ROS_DOMAIN を設定します．
 
 ```bash
 echo '. ~/turtlebot3_ws/install/setup.bash' >> ~/.bashrc
@@ -61,9 +61,9 @@ echo 'export ROS_DOMAIN_ID=30 #TURTLEBOT3' >> ~/.bashrc
 source ~/.bashrc
 ```
 
-#### 1.3. Intel RealSense SDK 2.0のインストール
+#### 1.3. Intel RealSense SDK 2.0 のインストール
 
-Intel RealSense SDK 2.0でCUDAを有効化するために，Jetson Orin Nanoでビルドしてインストールします．
+Intel RealSense SDK 2.0 で CUDA を有効化するために，Jetson Orin Nano でビルドしてインストールします．
 
 ```bash
 sudo apt install -y git libssl-dev libusb-1.0-0-dev pkg-config libgtk-3-dev
@@ -81,10 +81,10 @@ cmake .. -DBUILD_EXAMPLES=true -DCMAKE_BUILD_TYPE=release -DFORCE_RSUSB_BACKEND=
 
 Realsense D435i 内部のファームウェアのバージョンを Intel RealSense SDK 2.0 のバージョンと合わせる必要があります．
 
-[Realsense 公式サイト](https://dev.realsenseai.com/docs/firmware-releases-d400/)から，
-Version-5.16.0.1 を`Downloads`フォルダにダウンロードしてください．
+[Realsense 公式サイト](https://dev.realsenseai.com/docs/firmware-releases-d400/) から，
+Version-5.16.0.1 を `Downloads` フォルダにダウンロードしてください．
 
-Realsense D435i内臓ファームウェアを Jetson Orin Nano から書き込みます
+Realsense D435i 内臓ファームウェアを Jetson Orin Nano から書き込みます
 
 ```bash
 cd ~/Downloads/
@@ -92,9 +92,9 @@ unzip ./Signed_Image_UVC_5_16_0_1.zip
 rs-fw-update -f ./Signed_Image_UVC_5_16_0_1.bin
 ```
 
-#### 1.5. realsense-rosのインストール
+#### 1.5. realsense-ros のインストール
 
-ROSでIntel Realsense SDK 2.0を読み込むために，realsense-rosをインストールします．
+ROS で Intel Realsense SDK 2.0 を読み込むために，realsense-ros をインストールします．
 
 ```bash
 cd ~/turtlebot3_ws/src
@@ -113,9 +113,9 @@ rosdep install -i --from-path src --rosdistro $ROS_DISTRO --skip-keys=librealsen
 cd ~/turtlebot3_ws && colcon build --symlink-install && . install/setup.bash
 ```
 
-#### 1.6. その他の必要なROS2パッケージのインストール
+#### 1.6. その他の必要な ROS2 パッケージのインストール
 
-その他の必要なROS2パッケージをインストールします．
+その他の必要な ROS2 パッケージをインストールします．
 
 ```bash
 sudo apt install -y ros-humble-cartographer ros-humble-cartographer-ros ros-humble-navigation2 ros-humble-nav2-bringup ros-humble-dynamixel-sdk ros-humble-ros2-control ros-humble-ros2-controllers ros-humble-gripper-controllers ros-humble-moveit ros-humble-moveit-servo
@@ -125,9 +125,9 @@ git clone https://github.com/ldrobotSensorTeam/ldlidar_stl_ros2.git
 cd ~/turtlebot3_ws && colcon build --symlink-install && . install/setup.bash
 ```
 
-#### 1.7. OpenCRに権限を付与する
+#### 1.7. OpenCR に権限を付与する
 
-OpenCRと通信するために，権限を付与します．
+OpenCR と通信するために，権限を付与します．
 
 ```bash
 sudo curl -sSL https://raw.githubusercontent.com/ROBOTIS-GIT/turtlebot3/refs/heads/humble/turtlebot3_bringup/script/99-turtlebot3-cdc.rules -o /etc/udev/rules.d/99-turtlebot3-cdc.rules
@@ -135,9 +135,9 @@ sudo udevadm control --reload-rules
 sudo udevadm trigger
 ```
 
-#### 1.8. OpenCRのセットアップ
+#### 1.8. OpenCR のセットアップ
 
-OpenCRを Jetson Orin Nano を通して，セットアップを行います
+OpenCR を Jetson Orin Nano を通して，セットアップを行います
 
 ```bash
 sudo dpkg --add-architecture armhf
@@ -153,13 +153,13 @@ cd ./opencr_update
 ./update.sh $OPENCR_PORT $OPENCR_MODEL.opencr
 ```
 
-### 2. リモートPCの環境設定
+### 2. リモート PC の環境設定
 
-#### 2.1. リモートPC のセットアップについて
+#### 2.1. リモート PC のセットアップについて
 
-リモートPC側にも必要なROS 2パッケージや，ドライバをインストールする必要があります．
+リモート PC 側にも必要な ROS 2 パッケージや，ドライバをインストールする必要があります．
 
-#### 2.2. ROS 2 Humbleのインストール
+#### 2.2. ROS 2 Humble のインストール
 
 - ROS 2 がインストールされている場合
 
@@ -170,7 +170,7 @@ cd ./opencr_update
   cd ~/turtlebot3_ws && colcon build --symlink-install && . install/setup.bash
   ```
 
-  ワークスペースやROS_DOMAINを設定します．
+  ワークスペースや ROS_DOMAIN を設定します．
 
   ```bash
   echo '. ~/turtlebot3_ws/install/setup.bash' >> ~/.bashrc
@@ -182,7 +182,7 @@ cd ./opencr_update
     <details>
 
     <summary><a href="#12-ros-2-humble-のインストール">1.2. ROS 2 Humble のインストール</a>と同様です．</summary>
-    <a href="[#12-ros-2-humble-のインストール](https://docs.ros.org/en/humble/Installation/Ubuntu-Install-Debians.html))">ROS 公式のインストールガイド</a>に従って，ROS 2 Humbleをインストールします．
+    <a href="[#12-ros-2-humble-のインストール](https://docs.ros.org/en/humble/Installation/Ubuntu-Install-Debians.html))">ROS 公式のインストールガイド</a>に従って，ROS 2 Humble をインストールします．
     まず，Ubuntu Universe リポジトリが有効になっていることを確認します．
 
   ```bash
@@ -190,7 +190,7 @@ cd ./opencr_update
   sudo add-apt-repository universe
   ```
 
-  ROS 2 Humbleをインストールします．
+  ROS 2 Humble をインストールします．
 
   ```bash
   sudo apt update && sudo apt -y install curl gnupg lsb-release
@@ -210,7 +210,7 @@ cd ./opencr_update
   cd ~/turtlebot3_ws && colcon build --symlink-install && . install/setup.bash
   ```
 
-  ワークスペースやROS_DOMAINを設定します．
+  ワークスペースや ROS_DOMAIN を設定します．
 
   ```bash
   echo '. ~/turtlebot3_ws/install/setup.bash' >> ~/.bashrc
@@ -220,9 +220,9 @@ cd ./opencr_update
 
     </details>
 
-#### 2.3. その他の必要なROS2パッケージのインストール
+#### 2.3. その他の必要な ROS2 パッケージのインストール
 
-その他の必要なROS2パッケージをインストールします．
+その他の必要な ROS2 パッケージをインストールします．
 
 ```bash
 sudo apt update
@@ -233,7 +233,7 @@ git clone -b foxy-devel https://github.com/pal-robotics/realsense_gazebo_plugin.
 cd ~/turtlebot3_ws && colcon build --symlink-install && . install/setup.bash
 ```
 
-Gazeboのセットアップを毎回読み込むように設定します．
+Gazebo のセットアップを毎回読み込むように設定します．
 
 ```bash
 echo 'source /usr/share/gazebo/setup.sh' >> ~/.bashrc
@@ -244,7 +244,7 @@ source ~/.bashrc
 
 #### 3.1. セットアップ（この操作は，動かす際に必ず行ってください）
 
-**必ず，Jetson Orin NanoとリモートPCの時刻を同期してください．両方をインターネットに接続すれば，時刻が同期されます．**
+**必ず，Jetson Orin Nano とリモート PC の時刻を同期してください．両方をインターネットに接続すれば，時刻が同期されます．**
 
 Jetson Orin Nano に ssh 接続して，ドライバを立ち上げます．
 
@@ -262,7 +262,7 @@ ros2 launch turtlebot3_lime_moveit_config servo.launch.py
 
 #### 3.2. 地図を作る (SLAM)
 
-リモート PC 側でSLAMを立ち上げます．
+リモート PC 側で SLAM を立ち上げます．
 
 ```bash
 ros2 launch turtlebot3_lime_cartographer cartographer.launch.py
@@ -300,7 +300,7 @@ ros2 run nav2_map_server map_saver_cli -f ~/map
 
 #### 3.3. Navigation 2
 
-リモートPCで Navigation 2 を実行します．
+リモート PC で Navigation 2 を実行します．
 
 ```bash
 ros2 launch turtlebot3_lime_navigation2 navigation2.launch.py map_yaml_file:=$HOME/map.yaml
@@ -310,7 +310,7 @@ ros2 launch turtlebot3_lime_navigation2 navigation2.launch.py map_yaml_file:=$HO
 
 **MoveIt 2 実行中に bringup を終了しないでください．中断する場合は先に moveit を終了してください．**
 
-リモートPCで Move Group と RViz2 を起動します．
+リモート PC で Move Group と RViz2 を起動します．
 
 ```bash
 ros2 launch turtlebot3_lime_moveit_config moveit_core.launch.py
@@ -318,7 +318,7 @@ ros2 launch turtlebot3_lime_moveit_config moveit_core.launch.py
 
 #### 3.5. Navigation 2 と MoveIt 2 を同時に実行する
 
-リモートPCで以下のコマンドを実行します．
+リモート PC で以下のコマンドを実行します．
 
 ```bash
 ros2 launch turtlebot3_lime_bringup moveit_navigation.launch.py map_yaml_file:=$HOME/map.yaml
@@ -326,7 +326,7 @@ ros2 launch turtlebot3_lime_bringup moveit_navigation.launch.py map_yaml_file:=$
 
 #### 3.6. Realsense D435i のドライバを実行する
 
-Jetson Orin Nanoに ssh 接続して，ドライバを立ち上げます．
+Jetson Orin Nano に ssh 接続して，ドライバを立ち上げます．
 
 ```bash
 ros2 launch realsense2_camera rs_launch.py
@@ -336,7 +336,7 @@ ros2 launch realsense2_camera rs_launch.py
 
 #### 4.1. セットアップ
 
-この操作は，動かす際に全てリモートPCで行ってください．
+この操作は，動かす際に全てリモート PC で行ってください．
 
 Fake Hardware を起動します．
 
@@ -362,7 +362,7 @@ ros2 launch turtlebot3_lime_moveit_config moveit_fake.launch.py
 
 #### 5.1. セットアップ
 
-この操作は，動かす際に全てリモートPCで行ってください．
+この操作は，動かす際に全てリモート PC で行ってください．
 
 Gazebo を起動します．
 
@@ -380,7 +380,7 @@ ros2 launch turtlebot3_lime_moveit_config servo.launch.py use_sim_time:=true use
 
 ![cartographer](./img/cartographer.gif?raw=true)
 
-SLAMを立ち上げます．
+SLAM を立ち上げます．
 
 ```bash
 ros2 launch turtlebot3_lime_cartographer cartographer.launch.py use_sim_time:=true
@@ -446,11 +446,11 @@ ros2 launch turtlebot3_lime_moveit_config moveit_gazebo.launch.py
 ros2 launch turtlebot3_lime_bringup moveit_navigation.launch.py use_sim_time:=true use_gazebo:=true map_yaml_file:=$HOME/map.yaml
 ```
 
-## TurtleBot3 with OpenMANIPULATORのROBOTIS e-Manual
+## TurtleBot3 with OpenMANIPULATOR の ROBOTIS e-Manual
 
 - [TurtleBot3 with OpenMANIPULATOR](https://emanual.robotis.com/docs/en/platform/turtlebot3/manipulation/)
 
-## TurtleBot3に関するオープンソース関連
+## TurtleBot3 に関するオープンソース関連
 
 - [turtlebot3_manipulation](https://github.com/ROBOTIS-GIT/turtlebot3_manipulation/tree/humble-devel)
 - [turtlebot3](https://github.com/ROBOTIS-GIT/turtlebot3)
@@ -462,7 +462,7 @@ ros2 launch turtlebot3_lime_bringup moveit_navigation.launch.py use_sim_time:=tr
 - [OpenCR-Hardware](https://github.com/ROBOTIS-GIT/OpenCR-Hardware)
 - [OpenCR](https://github.com/ROBOTIS-GIT/OpenCR)
 
-## TurtleBot3に関するドキュメントと動画
+## TurtleBot3 に関するドキュメントと動画
 
 - [ROBOTIS e-Manual for TurtleBot3 with OpenMANIPULATOR](https://emanual.robotis.com/docs/en/platform/turtlebot3/manipulation/)
 - [ROBOTIS e-Manual for TurtleBot3](http://turtlebot3.robotis.com/)

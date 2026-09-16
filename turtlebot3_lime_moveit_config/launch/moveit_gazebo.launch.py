@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 #
 # Copyright 2020 ROBOTIS CO., LTD.
+# Copyright 2026 Hibikino-Musashi@Home
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,70 +16,71 @@
 # limitations under the License.
 #
 # Authors: Hye-jong KIM
-
-import os
+# Modified Contents:
+#   - Add prefix and use_rviz arguments and make the RViz launch conditional.
+#   - Pass Gazebo hardware and simulation clock settings to RViz and move_group.
+#   - Remove the embedded Gazebo bringup and world configuration.
+# Modified Maintainers: Fujino Tomoaki
 
 from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument
 from launch.actions import IncludeLaunchDescription
-from launch.substitutions import PathJoinSubstitution
+from launch.conditions import IfCondition
 from launch.launch_description_sources import PythonLaunchDescriptionSource
-from launch_ros.substitutions import FindPackageShare
-from ament_index_python.packages import get_package_share_directory
+from launch.substitutions import LaunchConfiguration
+from launch.substitutions import ThisLaunchFileDir
 
 
 def generate_launch_description():
-
     ld = LaunchDescription()
-    launch_dir = os.path.join(
-        get_package_share_directory(
-            'turtlebot3_lime_moveit_config'), 'launch')
-    bringup_launch_dir = os.path.join(
-        get_package_share_directory(
-            'turtlebot3_lime_bringup'), 'launch')
+
+    launch_dir = ThisLaunchFileDir()
+
+    # Launch Configurations
+    prefix = LaunchConfiguration('prefix')
+    use_rviz = LaunchConfiguration('use_rviz')
+
+    # Launch Arguments
+    declare_prefix = DeclareLaunchArgument(
+        'prefix',
+        default_value='',
+        description='Prefix of the joint and link names.',
+    )
+
+    declare_use_rviz = DeclareLaunchArgument(
+        'use_rviz',
+        default_value='true',
+        description='Whether to execute RViz2.',
+    )
+
+    ld.add_action(declare_use_rviz)
+    ld.add_action(declare_prefix)
 
     # RViz
     rviz_launch = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource([launch_dir, '/moveit_rviz.launch.py'])
+        PythonLaunchDescriptionSource([launch_dir, '/moveit_rviz.launch.py']),
+        launch_arguments={
+            'prefix': prefix,
+            'use_gazebo': 'true',
+            'use_fake_hardware': 'false',
+            'fake_sensor_commands': 'false',
+            'use_sim_time': 'true',
+        }.items(),
+        condition=IfCondition(use_rviz),
     )
     ld.add_action(rviz_launch)
 
-    # move_group
+    # Move Group
     move_group_launch = IncludeLaunchDescription(
-            PythonLaunchDescriptionSource([launch_dir, '/move_group.launch.py']),
-            launch_arguments={
-                'use_sim': 'true',
-            }.items(),
-        )
-    ld.add_action(move_group_launch)
-
-    # gazebo_control with robot_state_publisher
-    rviz_arg = DeclareLaunchArgument(
-        'start_rviz',
-        default_value='false',
-        description='Whether execute rviz2')
-    ld.add_action(rviz_arg)
-
-    empty_world_path = PathJoinSubstitution(
-        [
-            FindPackageShare('turtlebot3_lime_bringup'),
-            'worlds',
-            'empty_world.model'
-        ]
-    )
-
-    gazebo_control_launch = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource([bringup_launch_dir, '/gazebo.launch.py']),
+        PythonLaunchDescriptionSource([launch_dir, '/move_group.launch.py']),
         launch_arguments={
-            'world': empty_world_path,
-            'x_pose': '0.0',
-            'y_pose': '0.0',
-            'z_pose': '0.0',
-            'roll': '0.0',
-            'pitch': '0.0',
-            'yaw': '0.0',
+            'prefix': prefix,
+            'use_gazebo': 'true',
+            'use_fake_hardware': 'false',
+            'fake_sensor_commands': 'false',
+            'use_sim_time': 'true',
         }.items(),
-        )
-    ld.add_action(gazebo_control_launch)
+    )
+    ld.add_action(move_group_launch)
 
     return ld

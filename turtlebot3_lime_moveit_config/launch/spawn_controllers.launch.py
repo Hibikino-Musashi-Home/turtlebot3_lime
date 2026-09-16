@@ -17,26 +17,29 @@
 # Authors: Hye-jong KIM
 
 from launch import LaunchDescription
-from launch.actions import ExecuteProcess
+from launch_ros.actions import Node
 
 
 def generate_launch_description():
-    ld = LaunchDescription()
-
     # Load controllers
-    load_controllers = []
-    for controller in [
-        "arm_controller",
-        "gripper_controller",
-        "joint_state_broadcaster",
-    ]:
-        load_controllers += [
-            ExecuteProcess(
-                cmd=["ros2 run controller_manager spawner.py {}".format(controller)],
-                shell=True,
-                output="screen",
-            )
-        ]
-    ld.add_action(load_controllers)
+    controllers = [
+        'joint_state_broadcaster',
+        'arm_controller',
+        'gripper_controller',
+    ]
 
-    return ld
+    spawners = [
+        Node(
+            package='controller_manager',
+            executable='spawner',
+            arguments=[
+                controller,
+                '--controller-manager',
+                '/controller_manager',
+            ],
+            output='screen',
+        )
+        for controller in controllers
+    ]
+
+    return LaunchDescription(spawners)

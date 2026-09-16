@@ -13,6 +13,7 @@ arm_controller:
     - joint4
     - joint5
     - joint6
+
 gripper_controller:
   type: GripperCommand
   action_ns: gripper_cmd

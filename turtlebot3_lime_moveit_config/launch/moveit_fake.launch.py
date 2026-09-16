@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 #
 # Copyright 2020 ROBOTIS CO., LTD.
+# Copyright 2026 Hibikino-Musashi@Home
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,48 +16,88 @@
 # limitations under the License.
 #
 # Authors: Hye-jong KIM
+# Modified Contents:
+#   - Add prefix, use_rviz, fake_sensor_commands, and use_sim_time arguments.
+#   - Pass fake hardware settings to RViz and move_group and make RViz optional.
+#   - Remove the embedded fake hardware bringup launch.
+# Modified Maintainers: Fujino Tomoaki
 
-import os
 
 from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument
 from launch.actions import IncludeLaunchDescription
+from launch.conditions import IfCondition
 from launch.launch_description_sources import PythonLaunchDescriptionSource
-from ament_index_python.packages import get_package_share_directory
+from launch.substitutions import LaunchConfiguration
+from launch.substitutions import ThisLaunchFileDir
 
 
 def generate_launch_description():
-
     ld = LaunchDescription()
-    launch_dir = os.path.join(
-        get_package_share_directory(
-            'turtlebot3_lime_moveit_config'), 'launch')
-    bringup_launch_dir = os.path.join(
-        get_package_share_directory(
-            'turtlebot3_lime_bringup'), 'launch')
+
+    launch_dir = ThisLaunchFileDir()
+
+    # Launch Configurations
+    prefix = LaunchConfiguration('prefix')
+    use_rviz = LaunchConfiguration('use_rviz')
+    fake_sensor_commands = LaunchConfiguration('fake_sensor_commands')
+    use_sim_time = LaunchConfiguration('use_sim_time')
+
+    # Launch Arguments
+    declare_prefix = DeclareLaunchArgument(
+        'prefix',
+        default_value='',
+        description='Prefix of the joint and link names.',
+    )
+
+    declare_use_rviz = DeclareLaunchArgument(
+        'use_rviz',
+        default_value='true',
+        description='Whether to execute RViz2.',
+    )
+
+    declare_fake_sensor_commands = DeclareLaunchArgument(
+        'fake_sensor_commands',
+        default_value='false',
+        description='Enable fake command interfaces for sensors.',
+    )
+
+    declare_use_sim_time = DeclareLaunchArgument(
+        'use_sim_time',
+        default_value='false',
+        description='Use simulation clock if true.',
+    )
+
+    ld.add_action(declare_prefix)
+    ld.add_action(declare_use_rviz)
+    ld.add_action(declare_fake_sensor_commands)
+    ld.add_action(declare_use_sim_time)
 
     # RViz
     rviz_launch = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource([launch_dir, '/moveit_rviz.launch.py'])
+        PythonLaunchDescriptionSource([launch_dir, '/moveit_rviz.launch.py']),
+        launch_arguments={
+            'prefix': prefix,
+            'use_gazebo': 'false',
+            'use_fake_hardware': 'true',
+            'fake_sensor_commands': fake_sensor_commands,
+            'use_sim_time': use_sim_time,
+        }.items(),
+        condition=IfCondition(use_rviz),
     )
     ld.add_action(rviz_launch)
 
-    # move_group
+    # Move Group
     move_group_launch = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource([launch_dir, '/move_group.launch.py'])
+        PythonLaunchDescriptionSource([launch_dir, '/move_group.launch.py']),
+        launch_arguments={
+            'prefix': prefix,
+            'use_gazebo': 'false',
+            'use_fake_hardware': 'true',
+            'fake_sensor_commands': fake_sensor_commands,
+            'use_sim_time': use_sim_time,
+        }.items(),
     )
     ld.add_action(move_group_launch)
-
-    # fake controller
-    rviz_arg = DeclareLaunchArgument(
-        'start_rviz',
-        default_value='false',
-        description='Whether execute rviz2')
-    ld.add_action(rviz_arg)
-
-    fake_ros2_control_launch = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource([bringup_launch_dir, '/fake.launch.py'])
-    )
-    ld.add_action(fake_ros2_control_launch)
 
     return ld

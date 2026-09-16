@@ -228,11 +228,11 @@ int KeyboardServo::keyLoop() {
                 RCLCPP_INFO_STREAM(nh_->get_logger(), "\x1b[0K" << "Joint6 -");
                 break;
             case KEYCODE_O:
-                send_goal(0.025);
+                send_goal(0.019);
                 RCLCPP_INFO_STREAM(nh_->get_logger(), "\x1b[0K" << "Gripper Open");
                 break;
             case KEYCODE_P:
-                send_goal(-0.015);
+                send_goal(-0.010);
                 RCLCPP_INFO_STREAM(nh_->get_logger(), "\x1b[0K" << "Gripper Close");
                 break;
             case KEYCODE_ESC:

@@ -46,8 +46,10 @@ options = {
 
 MAP_BUILDER.use_trajectory_builder_2d = true
 
-TRAJECTORY_BUILDER_2D.min_range = 0.12
-TRAJECTORY_BUILDER_2D.max_range = 3.5
+-- Set the range limits according to the LD19 specifications.
+-- Measurement range: 0.3 m to 12.0 m
+TRAJECTORY_BUILDER_2D.min_range = 0.3
+TRAJECTORY_BUILDER_2D.max_range = 12.0
 TRAJECTORY_BUILDER_2D.missing_data_ray_length = 3.
 TRAJECTORY_BUILDER_2D.use_imu_data = false
 TRAJECTORY_BUILDER_2D.use_online_correlative_scan_matching = true

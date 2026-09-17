@@ -6,7 +6,7 @@ https://github.com/ROBOTIS-GIT/open_manipulator/blob/kinetic-devel/open_manipula
 -->
 <robot xmlns:xacro="http://www.ros.org/wiki/xacro">
 
-  <xacro:macro name="open_manipulator_sara" params="prefix arm_friction:=1.0 gripper_friction:=1.0">
+  <xacro:macro name="open_manipulator_sara" params="prefix use_gazebo:=false arm_friction:=1.0 gripper_friction:=1.0">
 
     <xacro:property name="meshes_file_direction" value="package://turtlebot3_lime_description/meshes/open_manipulator_sara"/>
 
@@ -277,7 +277,9 @@ https://github.com/ROBOTIS-GIT/open_manipulator/blob/kinetic-devel/open_manipula
       <origin xyz="0.0 -0.021 0.0707" rpy="0 0 0"/>
       <axis xyz="0 -1 0"/>
       <limit velocity="4.8" effort="1" lower="-0.010" upper="0.019" />
-      <mimic joint="${prefix}gripper_left_joint" multiplier="1"/>
+      <xacro:unless value="${use_gazebo}">
+        <mimic joint="${prefix}gripper_left_joint" multiplier="1"/>
+      </xacro:unless>
       <dynamics damping="0.7" friction="${gripper_friction}"/>
     </joint>
 

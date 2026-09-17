@@ -36,7 +36,7 @@
   </joint>
 
   <!-- Reduced simulation friction: effort limits are 1 N m (arm) and 1 N (gripper). -->
-  <xacro:open_manipulator_sara prefix="$(arg prefix)" arm_friction="0.01" gripper_friction="0.01" />
+  <xacro:open_manipulator_sara prefix="$(arg prefix)" use_gazebo="true" arm_friction="0.01" gripper_friction="0.01" />
 
   <xacro:turtlebot3_bigwheel_orin_gazebo prefix="$(arg prefix)" />
 

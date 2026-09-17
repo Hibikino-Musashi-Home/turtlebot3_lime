@@ -28,7 +28,7 @@
     <origin xyz="-0.036 0.0 0.07" rpy="0 0 0"/>
   </joint>
 
-  <xacro:open_manipulator_sara prefix="$(arg prefix)" />
+  <xacro:open_manipulator_sara prefix="$(arg prefix)" use_gazebo="$(arg use_gazebo)" arm_friction="1.0" gripper_friction="1.0"/>
 
   <xacro:turtlebot3_lime_system
     name="TurtleBot3LimeSystem"

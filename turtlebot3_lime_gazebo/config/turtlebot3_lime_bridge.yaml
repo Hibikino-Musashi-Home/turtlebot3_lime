@@ -20,33 +20,28 @@
   direction: GZ_TO_ROS
 
 # gz topic published by RGB-D camera sensor
-- ros_topic_name: "color/image_raw"
+- ros_topic_name: "camera/camera/color/image_raw"
   gz_topic_name: "camera/image"
   ros_type_name: "sensor_msgs/msg/Image"
   gz_type_name: "gz.msgs.Image"
   direction: GZ_TO_ROS
   lazy: true
+  qos_profile: SENSOR_DATA
 
 # gz topic published by RGB-D camera sensor
-- ros_topic_name: "aligned_depth_to_color/image_raw"
+- ros_topic_name: "camera/camera/aligned_depth_to_color/image_raw"
   gz_topic_name: "camera/depth_image"
   ros_type_name: "sensor_msgs/msg/Image"
   gz_type_name: "gz.msgs.Image"
   direction: GZ_TO_ROS
   lazy: true
+  qos_profile: SENSOR_DATA
 
 # gz topic published by RGB-D camera sensor
-- ros_topic_name: "color/camera_info"
-  gz_topic_name: "camera/camera_info"
-  ros_type_name: "sensor_msgs/msg/CameraInfo"
-  gz_type_name: "gz.msgs.CameraInfo"
-  direction: GZ_TO_ROS
-  lazy: true
-
-# gz topic published by RGB-D camera sensor
-- ros_topic_name: "depth/color/points"
+- ros_topic_name: "camera/camera/depth/color/points"
   gz_topic_name: "camera/points"
   ros_type_name: "sensor_msgs/msg/PointCloud2"
   gz_type_name: "gz.msgs.PointCloudPacked"
   direction: GZ_TO_ROS
   lazy: true
+  qos_profile: SENSOR_DATA

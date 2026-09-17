@@ -2,18 +2,26 @@
 #define TURTLEBOT3_LIME_TELEOP__TURTLEBOT3_LIME_TELEOP_HPP_
 
 #include <rclcpp/rclcpp.hpp>
+#include <rclcpp_action/rclcpp_action.hpp>
 #include <std_srvs/srv/trigger.hpp>
-#include <geometry_msgs/msg/twist_stamped.hpp>
+#include <geometry_msgs/msg/twist.hpp>
 #include <control_msgs/msg/joint_jog.hpp>
 #include <control_msgs/msg/gripper_command.hpp>
 #include <control_msgs/action/gripper_command.hpp>
-#include <rclcpp_action/rclcpp_action.hpp>
+
+#ifndef ROS_DISTRO_HUMBLE
+#include <geometry_msgs/msg/twist_stamped.hpp>
+#include <std_srvs/srv/set_bool.hpp>
+#include <moveit_msgs/srv/servo_command_type.hpp>
+#endif
 
 #include <signal.h>
 #include <stdio.h>
 #include <termios.h>
 #include <unistd.h>
+
 #include <chrono>
+#include <mutex>
 #include <string>
 
 // Define used keys
@@ -81,23 +89,41 @@ public:
   void stop_moveit_servo();
   void send_goal(float position);
 private:
-  rclcpp_action::Client<control_msgs::action::GripperCommand>::SharedPtr client_;
 
   void spin();
   void pub();
+  void set_joint_command(const std::string & joint_name, double velocity);
+
+  bool publish_joint_;
+  bool joint_key_repeating_;
+
+  std::chrono::steady_clock::time_point last_joint_input_time_;
+
+  std::mutex joint_mutex_;
+  std::mutex cmd_vel_mutex_;
 
   rclcpp::Node::SharedPtr nh_;
 
+  rclcpp_action::Client<control_msgs::action::GripperCommand>::SharedPtr client_;
+
+#ifdef ROS_DISTRO_HUMBLE
   rclcpp::Client<std_srvs::srv::Trigger>::SharedPtr servo_start_client_;
   rclcpp::Client<std_srvs::srv::Trigger>::SharedPtr servo_stop_client_;
-  rclcpp::Publisher<geometry_msgs::msg::Twist>::SharedPtr base_twist_pub_;
+#else
+  rclcpp::Client<std_srvs::srv::SetBool>::SharedPtr servo_pause_client_;
+  rclcpp::Client<moveit_msgs::srv::ServoCommandType>::SharedPtr servo_command_type_client_;
+#endif
+
+#ifdef ROS_DISTRO_HUMBLE
+    rclcpp::Publisher<geometry_msgs::msg::Twist>::SharedPtr base_twist_pub_;
+#else
+    rclcpp::Publisher<geometry_msgs::msg::TwistStamped>::SharedPtr base_twist_pub_;
+#endif
   rclcpp::Publisher<control_msgs::msg::JointJog>::SharedPtr joint_pub_;
 
   geometry_msgs::msg::Twist cmd_vel_;
   control_msgs::msg::JointJog joint_msg_;
   control_msgs::msg::GripperCommand gripper_cmd_;
-
-  bool publish_joint_;
 
   void goal_result_callback(const rclcpp_action::ClientGoalHandle<control_msgs::action::GripperCommand>::WrappedResult& result)
   {

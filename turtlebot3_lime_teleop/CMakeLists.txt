@@ -13,20 +13,40 @@ endif()
 # find dependencies
 find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
-find_package(turtlebot3_lime_bringup REQUIRED)
-find_package(turtlebot3_lime_moveit_config REQUIRED)
-find_package(turtlebot3_lime_description REQUIRED)
 find_package(geometry_msgs REQUIRED)
 find_package(nav_msgs REQUIRED)
 find_package(control_msgs REQUIRED)
 find_package(sensor_msgs REQUIRED)
 find_package(std_srvs REQUIRED)
 find_package(rclcpp_action REQUIRED)
+find_package(turtlebot3_lime_bringup REQUIRED)
+find_package(turtlebot3_lime_moveit_config REQUIRED)
+find_package(turtlebot3_lime_description REQUIRED)
+
+# ROS 2 distribution
+if("$ENV{ROS_DISTRO}" STREQUAL "humble")
+  set(ROS_DISTRO_HUMBLE TRUE)
+else()
+  find_package(moveit_msgs REQUIRED)
+endif()
 
 add_executable(turtlebot3_lime_teleop src/turtlebot3_lime_teleop.cpp)
+
+if(ROS_DISTRO_HUMBLE)
+  target_compile_definitions(
+    turtlebot3_lime_teleop PRIVATE ROS_DISTRO_HUMBLE
+  )
+else()
+  target_compile_definitions(
+    turtlebot3_lime_teleop PRIVATE ROS_DISTRO_JAZZY_OR_LATER
+  )
+endif()
+
 target_include_directories(turtlebot3_lime_teleop PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-  $<INSTALL_INTERFACE:include>)
+  $<INSTALL_INTERFACE:include>
+)
+
 ament_target_dependencies(
   turtlebot3_lime_teleop
   "rclcpp"
@@ -41,8 +61,16 @@ ament_target_dependencies(
   "rclcpp_action"
 )
 
+if(NOT ROS_DISTRO_HUMBLE)
+  ament_target_dependencies(
+    turtlebot3_lime_teleop
+    "moveit_msgs"
+  )
+endif()
+
 install(TARGETS turtlebot3_lime_teleop
-  DESTINATION lib/${PROJECT_NAME})
+  DESTINATION lib/${PROJECT_NAME}
+)
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)

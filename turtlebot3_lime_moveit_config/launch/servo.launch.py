@@ -35,6 +35,8 @@ from launch.substitutions import PathJoinSubstitution
 from launch_ros.actions import Node
 from launch_ros.substitutions import FindPackageShare
 
+ROS_DISTRO = os.environ.get('ROS_DISTRO', 'humble')
+
 
 def generate_launch_description():
     ld = LaunchDescription()
@@ -147,9 +149,13 @@ def generate_launch_description():
         return None
 
     # Launch as much as possible in components
+    if ROS_DISTRO == 'humble':
+        servo_executable = 'servo_node_main'
+    else:
+        servo_executable = 'servo_node'
     servo_node = Node(
         package='moveit_servo',
-        executable='servo_node_main',
+        executable=servo_executable,
         parameters=[
             {'use_gazebo': use_gazebo},
             {'use_sim_time': use_sim_time},

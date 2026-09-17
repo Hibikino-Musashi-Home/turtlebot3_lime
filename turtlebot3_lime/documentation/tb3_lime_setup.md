@@ -22,9 +22,16 @@ Turtlebot3 Lime を利用するには，Jetson Orin Nano に Jetpack 6.x をイ�
 2. [SDK Manager](https://developer.nvidia.com/sdk-manager) をインストールしてください．
 3. [公式のインストールガイド](https://docs.nvidia.com/sdk-manager/install-with-sdkm-jetson/index.html) に従って，Jetpack 6.x をインストールしてください．
 
-#### 1.2. ROS 2 Humble のインストール
+#### 1.2. ROS 2 Humble / Jazzy のインストール
 
-[ROS 公式のインストールガイド](https://docs.ros.org/en/humble/Installation/Ubuntu-Install-Debians.html) に従って，ROS 2 Humble をインストールします．
+使用する Ubuntu のバージョンに応じて，ROS 2 をインストールします．
+
+| Ubuntu           | ROS 2        |
+| ---------------- | ------------ |
+| Ubuntu 22.04 LTS | ROS 2 Humble |
+| Ubuntu 24.04 LTS | ROS 2 Jazzy  |
+
+ROS 2 のインストール方法については，[ROS 2 Humble 公式インストールガイド](https://docs.ros.org/en/humble/Installation/Ubuntu-Install-Debians.html) または [ROS 2 Jazzy 公式インストールガイド](https://docs.ros.org/en/jazzy/Installation/Ubuntu-Install-Debs.html) を参照してください．
 
 まず，Ubuntu Universe リポジトリが有効になっていることを確認します．
 
@@ -33,16 +40,45 @@ sudo apt install -y software-properties-common
 sudo add-apt-repository universe
 ```
 
-ROS 2 Humble をインストールします．
+使用している Ubuntu のバージョンに応じて `ROS_DISTRO` を設定します．
+
+Ubuntu 22.04 LTS の場合：
 
 ```bash
-sudo apt update && sudo apt -y install curl gnupg lsb-release
-sudo curl -sSL https://raw.githubusercontent.com/ros/rosdistro/master/ros.key -o /usr/share/keyrings/ros-archive-keyring.gpg
-echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/ros-archive-keyring.gpg] http://packages.ros.org/ros2/ubuntu $(. /etc/os-release && echo $UBUNTU_CODENAME) main" | sudo tee /etc/apt/sources.list.d/ros2.list > /dev/null
+export ROS_DISTRO=humble
+```
+
+Ubuntu 24.04 LTS の場合：
+
+```bash
+export ROS_DISTRO=jazzy
+```
+
+ROS 2 の APT リポジトリを追加します．
+
+```bash
+sudo apt update && sudo apt install -y curl gnupg lsb-release
+
+sudo curl -sSL https://raw.githubusercontent.com/ros/rosdistro/master/ros.key \
+  -o /usr/share/keyrings/ros-archive-keyring.gpg
+
+echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/ros-archive-keyring.gpg] http://packages.ros.org/ros2/ubuntu $(. /etc/os-release && echo $UBUNTU_CODENAME) main" \
+  | sudo tee /etc/apt/sources.list.d/ros2.list > /dev/null
+```
+
+ROS 2 Desktop をインストールします．
+
+```bash
 sudo apt update
-sudo apt install -y ros-humble-desktop
-echo "source /opt/ros/humble/setup.bash" >> ~/.bashrc
+sudo apt install -y ros-${ROS_DISTRO}-desktop
+
+echo "source /opt/ros/${ROS_DISTRO}/setup.bash" >> ~/.bashrc
 source ~/.bashrc
+```
+
+ROS 2 のビルドに必要なツールをインストールします．
+
+```bash
 sudo apt install -y python3-colcon-common-extensions python3-pip
 ```
 
@@ -50,14 +86,17 @@ sudo apt install -y python3-colcon-common-extensions python3-pip
 
 ```bash
 mkdir -p ~/turtlebot3_ws/src
-cd ~/turtlebot3_ws && colcon build --symlink-install && . install/setup.bash
+cd ~/turtlebot3_ws
+colcon build --symlink-install
+. install/setup.bash
 ```
 
-ワークスペースや ROS_DOMAIN を設定します．
+ワークスペースおよび ROS 2 Domain ID を設定します．
 
 ```bash
 echo '. ~/turtlebot3_ws/install/setup.bash' >> ~/.bashrc
-echo 'export ROS_DOMAIN_ID=30 #TURTLEBOT3' >> ~/.bashrc
+echo 'export ROS_DOMAIN_ID=30 # TURTLEBOT3' >> ~/.bashrc
+
 source ~/.bashrc
 ```
 

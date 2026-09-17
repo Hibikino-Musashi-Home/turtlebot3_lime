@@ -4,7 +4,6 @@
     name="turtlebot3_lime_imu_gazebo"
     params="prefix">
     <gazebo reference="${prefix}imu_link">
-      <material>Gazebo/Grey</material>
       <sensor name="imu" type="imu">
         <always_on>true</always_on>
         <update_rate>100.0</update_rate>

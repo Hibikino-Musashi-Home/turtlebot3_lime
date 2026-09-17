@@ -4,7 +4,6 @@
     name="turtlebot3_lime_lidar_gazebo"
     params="prefix">
     <gazebo reference="${prefix}base_scan">
-      <material>Gazebo/FlatBlack</material>
       <sensor name="lidar" type="gpu_lidar">
         <pose>0 0 0 0 0 0</pose>
         <always_on>true</always_on>

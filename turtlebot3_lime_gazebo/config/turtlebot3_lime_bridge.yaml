@@ -11,6 +11,8 @@
   ros_type_name: "sensor_msgs/msg/Imu"
   gz_type_name: "gz.msgs.IMU"
   direction: GZ_TO_ROS
+  lazy: true
+  qos_profile: SENSOR_DATA
 
 # gz topic published by GPU LiDAR sensor
 - ros_topic_name: "scan"
@@ -18,6 +20,8 @@
   ros_type_name: "sensor_msgs/msg/LaserScan"
   gz_type_name: "gz.msgs.LaserScan"
   direction: GZ_TO_ROS
+  lazy: true
+  qos_profile: SENSOR_DATA
 
 # gz topic published by RGB-D camera sensor
 - ros_topic_name: "camera/camera/color/image_raw"
@@ -36,6 +40,14 @@
   direction: GZ_TO_ROS
   lazy: true
   qos_profile: SENSOR_DATA
+
+# gz topic published by RGB-D camera sensor
+- ros_topic_name: "camera/camera/color/camera_info"
+  gz_topic_name: "camera/camera_info"
+  ros_type_name: "sensor_msgs/msg/CameraInfo"
+  gz_type_name: "gz.msgs.CameraInfo"
+  direction: GZ_TO_ROS
+  lazy: true
 
 # gz topic published by RGB-D camera sensor
 - ros_topic_name: "camera/camera/depth/color/points"

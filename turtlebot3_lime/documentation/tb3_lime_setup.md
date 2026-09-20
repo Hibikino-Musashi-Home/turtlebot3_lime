@@ -478,21 +478,32 @@ source ~/.bashrc
 > MoveIt 2 の実行中は `hardware.launch.py` および `rs_launch.py` を終了しないでください．終了する場合は，先に MoveIt 2 を終了してください．
 
 1. リモート PC で Move Group と RViz2 を起動します．
+
    - `Ctrl` + `Shift` + `T` を押してターミナルの新しいタブを開きます．
 
    - Move Group と RViz2 を起動します．
 
-     **[Remote PC]**
+   **[Remote PC]**
 
-     ```bash
-     ros2 launch turtlebot3_lime_moveit_config moveit_core.launch.py
-     ```
+   ```bash
+   ros2 launch turtlebot3_lime_moveit_config moveit_core.launch.py
+   ```
 
-2. RViz2 の `MotionPlanning` パネルを使用して，TurtleBot3 Lime のアームの目標姿勢を設定します．
+   デフォルトでは，**Occupancy Map Monitor は無効**になっています．
 
-3. `Plan` を実行して，目標姿勢までの軌道を生成します．
+   Occupancy Map Monitor を有効にすると，RealSense から取得した PointCloud を使用して周囲の障害物を OctoMap として構築し，MoveIt 2 の Planning Scene に反映できます．これにより，アームのモーションプランニング時に PointCloud から検出された周囲の障害物を考慮できます．
 
-4. `Execute` を実行して，生成した軌道に従ってアームを動作させます．
+   Occupancy Map Monitor を使用する場合は，`use_occupancy_map_monitor` を `true` に設定して起動します．
+
+   **[Remote PC]**
+
+   ```bash
+   ros2 launch turtlebot3_lime_moveit_config moveit_core.launch.py \
+     use_occupancy_map_monitor:=true
+   ```
+
+   > [!NOTE]
+   > Occupancy Map Monitor を有効にすると，把持対象物やロボット周辺の物体が PointCloud から OctoMap の障害物として登録される場合があります．把持動作を行う場合は，Planning Scene の設定や把持対象物の扱いに注意してください．
 
 #### 3.5. Navigation 2 と MoveIt 2 の同時実行
 
@@ -500,18 +511,36 @@ source ~/.bashrc
 > Navigation 2 および MoveIt 2 の実行中は `hardware.launch.py` および `rs_launch.py` を終了しないでください．終了する場合は，先に Navigation 2 および MoveIt 2 を終了してください．
 
 1. リモート PC で Navigation 2 と MoveIt 2 を起動します．
+
    - `Ctrl` + `Shift` + `T` を押してターミナルの新しいタブを開きます．
 
    - 「3.2. 地図の作成（SLAM）」で作成した地図を指定して，Navigation 2 と MoveIt 2 を起動します．
 
-     **[Remote PC]**
+   **[Remote PC]**
 
-     ```bash
-     ros2 launch turtlebot3_lime_bringup moveit_navigation.launch.py \
-       map_yaml_file:=$HOME/map.yaml
-     ```
+   ```bash
+   ros2 launch turtlebot3_lime_bringup moveit_navigation.launch.py \
+     map_yaml_file:=$HOME/map.yaml
+   ```
 
    Navigation 2 用と MoveIt 2 用の RViz2 がそれぞれ起動します．
+
+   デフォルトでは，**Occupancy Map Monitor は無効**になっています．
+
+   Occupancy Map Monitor を有効にすると，RealSense から取得した PointCloud を使用して周囲の障害物を OctoMap として構築し，MoveIt 2 の Planning Scene に反映できます．これにより，アームのモーションプランニング時に PointCloud から検出された周囲の障害物を考慮できます．
+
+   Occupancy Map Monitor を使用する場合は，`use_occupancy_map_monitor` を `true` に設定して起動します．
+
+   **[Remote PC]**
+
+   ```bash
+   ros2 launch turtlebot3_lime_bringup moveit_navigation.launch.py \
+     map_yaml_file:=$HOME/map.yaml \
+     use_occupancy_map_monitor:=true
+   ```
+
+   > [!NOTE]
+   > Occupancy Map Monitor を有効にすると，把持対象物やロボット周辺の物体が PointCloud から OctoMap の障害物として登録される場合があります．把持動作を行う場合は，Planning Scene の設定や把持対象物の扱いに注意してください．
 
 2. Navigation 2 用の RViz2 で `2D Pose Estimate` を使用して，地図上で TurtleBot3 Lime の初期位置と姿勢を設定します．
 
@@ -562,15 +591,30 @@ Fake Hardware を使用すると，TurtleBot3 Lime の実機を使用せずに�
 #### 4.2. MoveIt 2
 
 1. リモート PC で Fake Hardware 用の Move Group と RViz2 を起動します．
+
    - `Ctrl` + `Shift` + `T` を押してターミナルの新しいタブを開きます．
 
    - Move Group と RViz2 を起動します．
 
-     **[Remote PC]**
+   **[Remote PC]**
 
-     ```bash
-     ros2 launch turtlebot3_lime_moveit_config moveit_fake.launch.py
-     ```
+   ```bash
+   ros2 launch turtlebot3_lime_moveit_config moveit_fake.launch.py
+   ```
+
+   デフォルトでは，**Occupancy Map Monitor は無効**になっています．
+
+   Occupancy Map Monitor を使用する場合は，`use_occupancy_map_monitor` を `true` に設定して起動します．
+
+   **[Remote PC]**
+
+   ```bash
+   ros2 launch turtlebot3_lime_moveit_config moveit_fake.launch.py \
+     use_occupancy_map_monitor:=true
+   ```
+
+   > [!NOTE]
+   > Occupancy Map Monitor を有効にすると，PointCloud から周囲の障害物を OctoMap として構築し，MoveIt 2 の Planning Scene に反映できます．PointCloud を配信するセンサまたはノードが別途必要です．
 
 2. RViz2 の `MotionPlanning` パネルを使用して，TurtleBot3 Lime のアームの目標姿勢を設定します．
 
@@ -684,6 +728,20 @@ Gazebo 用 Move Group と RViz2 を起動します．
 ```bash
 ros2 launch turtlebot3_lime_moveit_config moveit_gazebo.launch.py
 ```
+
+デフォルトでは，**Occupancy Map Monitor は無効**になっています．
+
+Occupancy Map Monitor を有効にすると，RGB-D カメラから取得した PointCloud を使用して周囲の障害物を OctoMap として構築し，MoveIt 2 の Planning Scene に反映できます．これにより，アームのモーションプランニング時に PointCloud から検出された周囲の障害物を考慮できます．
+
+Occupancy Map Monitor を使用する場合は，`use_occupancy_map_monitor` を `true` に設定して起動します．
+
+```bash
+ros2 launch turtlebot3_lime_moveit_config moveit_gazebo.launch.py \
+  use_occupancy_map_monitor:=true
+```
+
+> [!NOTE]
+> Occupancy Map Monitor を有効にすると，把持対象物やロボット周辺の物体が PointCloud から OctoMap の障害物として登録される場合があります．把持動作を行う場合は，Planning Scene の設定や把持対象物の扱いに注意してください．
 
 #### 5.5. Navigation 2 と MoveIt 2 を同時に実行する
 

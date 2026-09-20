@@ -17,6 +17,7 @@
 #ifndef TURTLEBOT3_LIME_HARDWARE__TURTLEBOT3_LIME_SYSTEM_HPP_
 #define TURTLEBOT3_LIME_HARDWARE__TURTLEBOT3_LIME_SYSTEM_HPP_
 
+#include <array>
 #include <memory>
 #include <string>
 #include <vector>
@@ -41,15 +42,23 @@ class TurtleBot3LimeSystemHardware
    public:
     RCLCPP_SHARED_PTR_DEFINITIONS(TurtleBot3LimeSystemHardware);
 
+#ifdef ROS_DISTRO_HUMBLE
     TURTLEBOT3_LIME_HARDWARE_PUBLIC
     hardware_interface::CallbackReturn on_init(
         const hardware_interface::HardwareInfo& info) override;
+#else
+    TURTLEBOT3_LIME_HARDWARE_PUBLIC
+    hardware_interface::CallbackReturn on_init(
+        const hardware_interface::HardwareComponentInterfaceParams& params) override;
+#endif
 
+#ifdef ROS_DISTRO_HUMBLE
     TURTLEBOT3_LIME_HARDWARE_PUBLIC
     std::vector<hardware_interface::StateInterface> export_state_interfaces() override;
 
     TURTLEBOT3_LIME_HARDWARE_PUBLIC
     std::vector<hardware_interface::CommandInterface> export_command_interfaces() override;
+#endif
 
     TURTLEBOT3_LIME_HARDWARE_PUBLIC
     hardware_interface::CallbackReturn on_activate(
@@ -81,6 +90,7 @@ class TurtleBot3LimeSystemHardware
 
     std::unique_ptr<OpenCR> opencr_;
 
+#ifdef ROS_DISTRO_HUMBLE
     std::vector<double> dxl_wheel_commands_;
     std::vector<double> dxl_joint_commands_;
     std::vector<double> dxl_gripper_commands_;
@@ -89,6 +99,7 @@ class TurtleBot3LimeSystemHardware
     std::vector<double> dxl_velocities_;
 
     std::vector<double> opencr_sensor_states_;
+#endif
 };
 }  // namespace turtlebot3_lime_hardware
 }  // namespace robotis

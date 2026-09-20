@@ -16,6 +16,8 @@
 #
 # Authors: Tomoaki Fujino
 
+import os
+
 from launch import LaunchDescription
 from launch.actions import RegisterEventHandler
 from launch.event_handlers import OnProcessExit
@@ -25,6 +27,14 @@ from launch_ros.substitutions import FindPackageShare
 
 
 def generate_launch_description():
+
+    ros_distro = os.environ.get('ROS_DISTRO')
+
+    if ros_distro == 'humble':
+        cmd_vel_topic = 'cmd_vel_unstamped'
+    else:
+        cmd_vel_topic = 'cmd_vel'
+
     controller_manager_config = PathJoinSubstitution(
         [
             FindPackageShare('turtlebot3_lime_hardware'),
@@ -55,19 +65,12 @@ def generate_launch_description():
             '/controller_manager',
             '--param-file',
             controller_manager_config,
-        ],
-        output='screen',
-    )
-
-    imu_broadcaster_spawner = Node(
-        package='controller_manager',
-        executable='spawner',
-        arguments=[
-            'imu_broadcaster',
-            '--controller-manager',
-            '/controller_manager',
-            '--param-file',
-            controller_manager_config,
+            '--controller-ros-args',
+            (
+                f'--ros-args '
+                f'--remap /diff_drive_controller/{cmd_vel_topic}:=/cmd_vel '
+                f'--remap /diff_drive_controller/odom:=/odom'
+            ),
         ],
         output='screen',
     )
@@ -98,15 +101,54 @@ def generate_launch_description():
         output='screen',
     )
 
+    imu_broadcaster_spawner = Node(
+        package='controller_manager',
+        executable='spawner',
+        arguments=[
+            'imu_broadcaster',
+            '--controller-manager',
+            '/controller_manager',
+            '--param-file',
+            controller_manager_config,
+            '--controller-ros-args',
+            '--ros-args --remap /imu_broadcaster/imu:=/imu',
+        ],
+        output='screen',
+    )
+
+    if ros_distro != 'humble':
+        battery_state_broadcaster_spawner = Node(
+            package='controller_manager',
+            executable='spawner',
+            arguments=[
+                'battery_state_broadcaster',
+                '--controller-manager',
+                '/controller_manager',
+                '--param-file',
+                controller_manager_config,
+                '--controller-ros-args',
+                '--ros-args --remap /battery_state_broadcaster/battery_state:=/battery_state',
+            ],
+            output='screen',
+        )
+
+    controller_spawners = [
+        diff_drive_controller_spawner,
+        imu_broadcaster_spawner,
+        arm_controller_spawner,
+        gripper_controller_spawner,
+    ]
+
+    if ros_distro != 'humble':
+        controller_spawners.insert(
+            2,
+            battery_state_broadcaster_spawner,
+        )
+
     start_controllers = RegisterEventHandler(
         OnProcessExit(
             target_action=joint_state_broadcaster_spawner,
-            on_exit=[
-                diff_drive_controller_spawner,
-                imu_broadcaster_spawner,
-                arm_controller_spawner,
-                gripper_controller_spawner,
-            ],
+            on_exit=controller_spawners,
         )
     )
 

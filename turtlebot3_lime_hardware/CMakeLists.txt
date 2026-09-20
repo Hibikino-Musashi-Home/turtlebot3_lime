@@ -43,6 +43,10 @@ target_include_directories(${PROJECT_NAME}
     $<INSTALL_INTERFACE:include>
 )
 
+if("$ENV{ROS_DISTRO}" STREQUAL "humble")
+  target_compile_definitions(${PROJECT_NAME} PRIVATE ROS_DISTRO_HUMBLE)
+endif()
+
 pluginlib_export_plugin_description_file(hardware_interface turtlebot3_lime_hardware.xml)
 
 ################################################################################

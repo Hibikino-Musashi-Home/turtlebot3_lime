@@ -16,7 +16,7 @@ https://github.com/ros-controls/ros2_control_demos/blob/foxy/ros2_control_demo_d
 
       <hardware>
         <xacro:if value="${use_fake_hardware}">
-          <plugin>fake_components/GenericSystem</plugin>
+          <plugin>mock_components/GenericSystem</plugin>
           <param name="fake_sensor_commands">${fake_sensor_commands}</param>
           <param name="state_following_offset">0.0</param>
         </xacro:if>
@@ -39,10 +39,15 @@ https://github.com/ros-controls/ros2_control_demos/blob/foxy/ros2_control_demo_d
         </xacro:unless>
       </hardware>
 
+      <!--
+        Define the initial command values here to keep the initial commands
+        consistent across hardware, Gazebo, and fake hardware.
+      -->
       <joint name="${prefix}wheel_left_joint">
         <command_interface name="velocity">
           <param name="min">-24.5</param>
           <param name="max">24.5</param>
+          <param name="initial_value">0.0</param>
         </command_interface>
         <state_interface name="position">
           <param name="initial_value">0.0</param>
@@ -55,6 +60,7 @@ https://github.com/ros-controls/ros2_control_demos/blob/foxy/ros2_control_demo_d
         <command_interface name="velocity">
           <param name="min">-24.5</param>
           <param name="max">24.5</param>
+          <param name="initial_value">0.0</param>
         </command_interface>
         <state_interface name="position">
           <param name="initial_value">0.0</param>
@@ -98,24 +104,24 @@ https://github.com/ros-controls/ros2_control_demos/blob/foxy/ros2_control_demo_d
       </sensor>
 
       <sensor name="battery">
-        <state_interface name="voltage">
-          <param name="initial_value">0.0</param>
+        <state_interface name="battery_voltage">
+          <param name="initial_value">12.0</param>
         </state_interface>
-        <state_interface name="percentage">
-          <param name="initial_value">0.0</param>
+        <state_interface name="battery_percentage">
+          <param name="initial_value">100.0</param>
         </state_interface>
-        <state_interface name="design_capacity">
-          <param name="initial_value">0.0</param>
-        </state_interface>
-        <state_interface name="present">
-          <param name="initial_value">0.0</param>
-        </state_interface>
+        <xacro:unless value="${ros_distro == 'humble'}">
+          <state_interface name="battery_present" data_type="bool">
+            <param name="initial_value">true</param>
+          </state_interface>
+        </xacro:unless>
       </sensor>
 
       <joint name="${prefix}joint1">
         <command_interface name="position">
           <param name="min">${-pi*0.9}</param>
           <param name="max">${pi*0.9}</param>
+          <param name="initial_value">0.0</param>
         </command_interface>
         <state_interface name="position">
           <param name="initial_value">0.0</param>
@@ -128,21 +134,24 @@ https://github.com/ros-controls/ros2_control_demos/blob/foxy/ros2_control_demo_d
         <command_interface name="position">
           <param name="min">${-pi*0.57}</param>
           <param name="max">${pi*0.5}</param>
+          <param name="initial_value">-1.10</param>
         </command_interface>
         <state_interface name="position">
-          <param name="initial_value">0.0</param>
+          <param name="initial_value">-1.10</param>
         </state_interface>
         <state_interface name="velocity">
           <param name="initial_value">0.0</param>
         </state_interface>
       </joint>
+      <!-- FIXME Verify the joint3 limits and set a valid initial position. -->
       <joint name="${prefix}joint3">
         <command_interface name="position">
           <param name="min">${-pi*0.3}</param>
           <param name="max">${pi*0.44}</param>
+          <param name="initial_value">1.80</param>
         </command_interface>
         <state_interface name="position">
-          <param name="initial_value">0.0</param>
+          <param name="initial_value">1.80</param>
         </state_interface>
         <state_interface name="velocity">
           <param name="initial_value">0.0</param>
@@ -152,6 +161,7 @@ https://github.com/ros-controls/ros2_control_demos/blob/foxy/ros2_control_demo_d
         <command_interface name="position">
           <param name="min">${-pi*0.57}</param>
           <param name="max">${pi*0.65}</param>
+          <param name="initial_value">0.0</param>
         </command_interface>
         <state_interface name="position">
           <param name="initial_value">0.0</param>
@@ -164,9 +174,10 @@ https://github.com/ros-controls/ros2_control_demos/blob/foxy/ros2_control_demo_d
         <command_interface name="position">
           <param name="min">${-pi*0.57}</param>
           <param name="max">${pi*0.65}</param>
+          <param name="initial_value">0.98</param>
         </command_interface>
         <state_interface name="position">
-          <param name="initial_value">0.0</param>
+          <param name="initial_value">0.98</param>
         </state_interface>
         <state_interface name="velocity">
           <param name="initial_value">0.0</param>
@@ -176,6 +187,7 @@ https://github.com/ros-controls/ros2_control_demos/blob/foxy/ros2_control_demo_d
         <command_interface name="position">
           <param name="min">${-pi*0.57}</param>
           <param name="max">${pi*0.65}</param>
+          <param name="initial_value">0.0</param>
         </command_interface>
         <state_interface name="position">
           <param name="initial_value">0.0</param>
@@ -184,10 +196,12 @@ https://github.com/ros-controls/ros2_control_demos/blob/foxy/ros2_control_demo_d
           <param name="initial_value">0.0</param>
         </state_interface>
       </joint>
+      <!-- FIXME Verify the gripper joint limits against the URDF and teleop commands. -->
       <joint name="${prefix}gripper_left_joint">
         <command_interface name="position">
           <param name="min">-0.010</param>
           <param name="max">0.019</param>
+          <param name="initial_value">0.0</param>
         </command_interface>
         <state_interface name="position">
           <param name="initial_value">0.0</param>

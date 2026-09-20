@@ -14,6 +14,16 @@
 //
 // Author: Darby Lim
 
+// ROS 2 Humble and Jazzy use different ros2_control hardware interface APIs.
+//
+// In Jazzy, command and state interfaces defined in the ros2_control XML
+// are automatically created and exported by the framework. Therefore,
+// Jazzy uses set_state() and get_command() instead of the legacy
+// export_state_interfaces() and export_command_interfaces() APIs.
+//
+// REF:
+// https://control.ros.org/jazzy/doc/ros2_control/doc/migration.html
+
 #include <array>
 #include <chrono>
 #include <cmath>
@@ -27,6 +37,8 @@
 namespace robotis {
 namespace turtlebot3_lime_hardware {
 auto logger = rclcpp::get_logger("turtlebot3_lime");
+
+#ifdef ROS_DISTRO_HUMBLE
 hardware_interface::CallbackReturn TurtleBot3LimeSystemHardware::on_init(
     const hardware_interface::HardwareInfo& info) {
     if (
@@ -34,6 +46,15 @@ hardware_interface::CallbackReturn TurtleBot3LimeSystemHardware::on_init(
         hardware_interface::CallbackReturn::SUCCESS) {
         return hardware_interface::CallbackReturn::ERROR;
     }
+#else
+hardware_interface::CallbackReturn TurtleBot3LimeSystemHardware::on_init(
+    const hardware_interface::HardwareComponentInterfaceParams& params) {
+    if (
+        hardware_interface::SystemInterface::on_init(params) !=
+        hardware_interface::CallbackReturn::SUCCESS) {
+        return hardware_interface::CallbackReturn::ERROR;
+    }
+#endif
 
     id_ = stoi(info_.hardware_parameters["opencr_id"]);
     usb_port_ = info_.hardware_parameters["opencr_usb_port"];
@@ -89,6 +110,8 @@ hardware_interface::CallbackReturn TurtleBot3LimeSystemHardware::on_init(
         return hardware_interface::CallbackReturn::ERROR;
     }
 
+#ifdef ROS_DISTRO_HUMBLE
+    // Humble uses manually allocated storage for command and state interfaces.
     dxl_wheel_commands_.resize(2, 0.0);
 
     dxl_joint_commands_.resize(6, 0.0);
@@ -103,15 +126,21 @@ hardware_interface::CallbackReturn TurtleBot3LimeSystemHardware::on_init(
 
     dxl_positions_.resize(info_.joints.size(), 0.0);
     dxl_velocities_.resize(info_.joints.size(), 0.0);
+#endif
 
+#ifdef ROS_DISTRO_HUMBLE
+    // Humble uses manually allocated storage for state interfaces.
     opencr_sensor_states_.resize(
         info_.sensors[0].state_interfaces.size() +
             info_.sensors[1].state_interfaces.size(),
         0.0);
+#endif
 
     return hardware_interface::CallbackReturn::SUCCESS;
 }
 
+#ifdef ROS_DISTRO_HUMBLE
+// Humble uses the legacy ros2_control interface export API.
 std::vector<hardware_interface::StateInterface>
 TurtleBot3LimeSystemHardware::export_state_interfaces() {
     std::vector<hardware_interface::StateInterface> state_interfaces;
@@ -136,7 +165,10 @@ TurtleBot3LimeSystemHardware::export_state_interfaces() {
 
     return state_interfaces;
 }
+#endif
 
+#ifdef ROS_DISTRO_HUMBLE
+// Humble uses the legacy ros2_control interface export API.
 std::vector<hardware_interface::CommandInterface>
 TurtleBot3LimeSystemHardware::export_command_interfaces() {
     std::vector<hardware_interface::CommandInterface> command_interfaces;
@@ -176,6 +208,7 @@ TurtleBot3LimeSystemHardware::export_command_interfaces() {
 
     return command_interfaces;
 }
+#endif
 
 hardware_interface::CallbackReturn TurtleBot3LimeSystemHardware::on_activate(
     const rclcpp_lifecycle::State& /*previous_state*/) {
@@ -226,6 +259,8 @@ hardware_interface::return_type TurtleBot3LimeSystemHardware::read(
         RCLCPP_WARN(logger, "Failed to read all control table");
     }
 
+#ifdef ROS_DISTRO_HUMBLE
+
     dxl_positions_[0] = opencr_->get_wheel_positions()[opencr::wheels::LEFT];
     dxl_velocities_[0] = opencr_->get_wheel_velocities()[opencr::wheels::LEFT];
 
@@ -274,6 +309,75 @@ hardware_interface::return_type TurtleBot3LimeSystemHardware::read(
     opencr_sensor_states_[12] = opencr_->get_battery().design_capacity;
     opencr_sensor_states_[13] = opencr_->get_battery().present;
 
+#else
+    // Jazzy state interfaces are managed by the ros2_control framework.
+    const auto wheel_positions = opencr_->get_wheel_positions();
+    const auto wheel_velocities = opencr_->get_wheel_velocities();
+    const auto joint_positions = opencr_->get_joint_positions();
+    const auto joint_velocities = opencr_->get_joint_velocities();
+    const auto gripper_position = opencr_->get_gripper_position();
+    const auto gripper_velocity = opencr_->get_gripper_velocity();
+    const auto imu = opencr_->get_imu();
+    const auto battery = opencr_->get_battery();
+
+    set_state<double>(
+        "wheel_left_joint/position",
+        wheel_positions[opencr::wheels::LEFT]);
+    set_state<double>(
+        "wheel_left_joint/velocity",
+        wheel_velocities[opencr::wheels::LEFT]);
+
+    set_state<double>(
+        "wheel_right_joint/position",
+        wheel_positions[opencr::wheels::RIGHT]);
+    set_state<double>(
+        "wheel_right_joint/velocity",
+        wheel_velocities[opencr::wheels::RIGHT]);
+
+    set_state<double>("joint1/position", joint_positions[opencr::joints::JOINT1]);
+    set_state<double>("joint1/velocity", joint_velocities[opencr::joints::JOINT1]);
+
+    set_state<double>("joint2/position", joint_positions[opencr::joints::JOINT2]);
+    set_state<double>("joint2/velocity", joint_velocities[opencr::joints::JOINT2]);
+
+    set_state<double>("joint3/position", joint_positions[opencr::joints::JOINT3]);
+    set_state<double>("joint3/velocity", joint_velocities[opencr::joints::JOINT3]);
+
+    set_state<double>("joint4/position", joint_positions[opencr::joints::JOINT4]);
+    set_state<double>("joint4/velocity", joint_velocities[opencr::joints::JOINT4]);
+
+    set_state<double>("joint5/position", joint_positions[opencr::joints::JOINT5]);
+    set_state<double>("joint5/velocity", joint_velocities[opencr::joints::JOINT5]);
+
+    set_state<double>("joint6/position", joint_positions[opencr::joints::JOINT6]);
+    set_state<double>("joint6/velocity", joint_velocities[opencr::joints::JOINT6]);
+
+    set_state<double>("gripper_left_joint/position", gripper_position);
+    set_state<double>("gripper_left_joint/velocity", gripper_velocity);
+    set_state<double>("gripper_right_joint/position", gripper_position);
+    set_state<double>("gripper_right_joint/velocity", gripper_velocity);
+
+    set_state<double>("imu/orientation.x", imu.orientation.x);
+    set_state<double>("imu/orientation.y", imu.orientation.y);
+    set_state<double>("imu/orientation.z", imu.orientation.z);
+    set_state<double>("imu/orientation.w", imu.orientation.w);
+
+    set_state<double>("imu/angular_velocity.x", imu.angular_velocity.x);
+    set_state<double>("imu/angular_velocity.y", imu.angular_velocity.y);
+    set_state<double>("imu/angular_velocity.z", imu.angular_velocity.z);
+
+    set_state<double>("imu/linear_acceleration.x", imu.linear_acceleration.x);
+    set_state<double>("imu/linear_acceleration.y", imu.linear_acceleration.y);
+    set_state<double>("imu/linear_acceleration.z", imu.linear_acceleration.z);
+
+    set_state<double>("battery/battery_voltage", battery.voltage);
+    set_state<double>("battery/battery_percentage", battery.percentage);
+
+    // Jazzy supports typed state interfaces, so battery_present is stored as bool.
+    set_state<bool>("battery/battery_present", battery.present);
+
+#endif
+
     return hardware_interface::return_type::OK;
 }
 
@@ -281,6 +385,8 @@ hardware_interface::return_type TurtleBot3LimeSystemHardware::write(
     const rclcpp::Time& /*time*/, const rclcpp::Duration& /*period*/) {
     RCLCPP_INFO_ONCE(logger, "Start to write wheels and manipulator commands");
     opencr_->send_heartbeat(heartbeat_++);
+
+#ifdef ROS_DISTRO_HUMBLE
 
     if (opencr_->set_wheel_velocities(dxl_wheel_commands_) == false) {
         RCLCPP_ERROR(logger, "Can't control wheels");
@@ -293,6 +399,39 @@ hardware_interface::return_type TurtleBot3LimeSystemHardware::write(
     if (opencr_->set_gripper_position(dxl_gripper_commands_[0]) == false) {
         RCLCPP_ERROR(logger, "Can't control gripper");
     }
+
+#else
+    // Jazzy command interfaces are managed by the ros2_control framework.
+    const std::vector<double> wheel_commands = {
+        get_command<double>("wheel_left_joint/velocity"),
+        get_command<double>("wheel_right_joint/velocity"),
+    };
+
+    const std::vector<double> joint_commands = {
+        get_command<double>("joint1/position"),
+        get_command<double>("joint2/position"),
+        get_command<double>("joint3/position"),
+        get_command<double>("joint4/position"),
+        get_command<double>("joint5/position"),
+        get_command<double>("joint6/position"),
+    };
+
+    const double gripper_command =
+        get_command<double>("gripper_left_joint/position");
+
+    if (opencr_->set_wheel_velocities(wheel_commands) == false) {
+        RCLCPP_ERROR(logger, "Can't control wheels");
+    }
+
+    if (opencr_->set_joint_positions(joint_commands) == false) {
+        RCLCPP_ERROR(logger, "Can't control joints");
+    }
+
+    if (opencr_->set_gripper_position(gripper_command) == false) {
+        RCLCPP_ERROR(logger, "Can't control gripper");
+    }
+
+#endif
 
     return hardware_interface::return_type::OK;
 }

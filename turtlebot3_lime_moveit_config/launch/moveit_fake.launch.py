@@ -20,6 +20,7 @@
 #   - Add prefix, use_rviz, fake_sensor_commands, and use_sim_time arguments.
 #   - Pass fake hardware settings to RViz and move_group and make RViz optional.
 #   - Remove the embedded fake hardware bringup launch.
+#   - Add an option to enable or disable the occupancy map monitor.
 # Modified Maintainers: Fujino Tomoaki
 
 
@@ -41,6 +42,7 @@ def generate_launch_description():
     prefix = LaunchConfiguration('prefix')
     use_rviz = LaunchConfiguration('use_rviz')
     fake_sensor_commands = LaunchConfiguration('fake_sensor_commands')
+    use_occupancy_map_monitor = LaunchConfiguration('use_occupancy_map_monitor')
     use_sim_time = LaunchConfiguration('use_sim_time')
 
     # Launch Arguments
@@ -62,15 +64,23 @@ def generate_launch_description():
         description='Enable fake command interfaces for sensors.',
     )
 
+    declare_use_occupancy_map_monitor = DeclareLaunchArgument(
+        'use_occupancy_map_monitor',
+        default_value='false',
+        description='Enable the MoveIt occupancy map monitor.',
+    )
+
     declare_use_sim_time = DeclareLaunchArgument(
         'use_sim_time',
         default_value='false',
         description='Use simulation clock if true.',
     )
 
+
     ld.add_action(declare_prefix)
     ld.add_action(declare_use_rviz)
     ld.add_action(declare_fake_sensor_commands)
+    ld.add_action(declare_use_occupancy_map_monitor)
     ld.add_action(declare_use_sim_time)
 
     # RViz
@@ -95,6 +105,7 @@ def generate_launch_description():
             'use_gazebo': 'false',
             'use_fake_hardware': 'true',
             'fake_sensor_commands': fake_sensor_commands,
+            'use_occupancy_map_monitor': use_occupancy_map_monitor,
             'use_sim_time': use_sim_time,
         }.items(),
     )

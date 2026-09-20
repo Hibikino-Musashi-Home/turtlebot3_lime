@@ -21,6 +21,7 @@
 #   - Separate use_gazebo from use_sim_time and select OMPL adapters according to ROS_DISTRO.
 #   - Load joint limits and pass kinematics under robot_description_kinematics.
 #   - Load 3D sensor settings and configure the OctoMap frame and resolution.
+#   - Add an option to enable or disable the occupancy map monitor.
 # Modified Maintainers: Fujino Tomoaki
 
 import os
@@ -30,6 +31,7 @@ import yaml
 from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument
+from launch.actions import OpaqueFunction
 from launch.substitutions import Command
 from launch.substitutions import FindExecutable
 from launch.substitutions import LaunchConfiguration
@@ -38,6 +40,48 @@ from launch_ros.actions import Node
 from launch_ros.substitutions import FindPackageShare
 
 ROS_DISTRO = os.environ.get('ROS_DISTRO')
+
+
+def launch_move_group(
+    context,
+    robot_description,
+    robot_description_semantic,
+    robot_description_kinematics,
+    robot_description_planning,
+    ompl_planning_pipeline_config,
+    trajectory_execution,
+    moveit_controllers,
+    planning_scene_monitor_parameters,
+    occupancy_map_monitor_parameters,
+    use_sim_time,
+):
+    use_occupancy_map_monitor = (
+        LaunchConfiguration('use_occupancy_map_monitor').perform(context).lower() == 'true'
+    )
+
+    parameters = [
+        robot_description,
+        robot_description_semantic,
+        robot_description_kinematics,
+        robot_description_planning,
+        ompl_planning_pipeline_config,
+        trajectory_execution,
+        moveit_controllers,
+        planning_scene_monitor_parameters,
+        {'use_sim_time': use_sim_time},
+    ]
+
+    if use_occupancy_map_monitor:
+        parameters.append(occupancy_map_monitor_parameters)
+
+    move_group_node = Node(
+        package='moveit_ros_move_group',
+        executable='move_group',
+        output='screen',
+        parameters=parameters,
+    )
+
+    return [move_group_node]
 
 
 def generate_launch_description():
@@ -51,6 +95,50 @@ def generate_launch_description():
     use_fake_hardware = LaunchConfiguration('use_fake_hardware')
     fake_sensor_commands = LaunchConfiguration('fake_sensor_commands')
     use_sim_time = LaunchConfiguration('use_sim_time')
+
+    # Launch Arguments
+    declare_prefix = DeclareLaunchArgument(
+        'prefix',
+        default_value='',
+        description='Prefix of the joint and link names.',
+    )
+
+    declare_use_gazebo = DeclareLaunchArgument(
+        'use_gazebo',
+        default_value='false',
+        description='Use Gazebo Sim ros2_control hardware.',
+    )
+
+    declare_use_fake_hardware = DeclareLaunchArgument(
+        'use_fake_hardware',
+        default_value='false',
+        description='Use fake ros2_control hardware.',
+    )
+
+    declare_fake_sensor_commands = DeclareLaunchArgument(
+        'fake_sensor_commands',
+        default_value='false',
+        description='Enable fake command interfaces for sensors.',
+    )
+
+    declare_use_occupancy_map_monitor = DeclareLaunchArgument(
+        'use_occupancy_map_monitor',
+        default_value='false',
+        description='Enable the MoveIt occupancy map monitor.',
+    )
+
+    declare_use_sim_time = DeclareLaunchArgument(
+        'use_sim_time',
+        default_value='false',
+        description='Use simulation clock if true.',
+    )
+
+    ld.add_action(declare_prefix)
+    ld.add_action(declare_use_gazebo)
+    ld.add_action(declare_use_fake_hardware)
+    ld.add_action(declare_fake_sensor_commands)
+    ld.add_action(declare_use_occupancy_map_monitor)
+    ld.add_action(declare_use_sim_time)
 
     # Robot Description
     robot_description_content = Command(
@@ -221,61 +309,23 @@ def generate_launch_description():
         'publish_robot_description_semantic': True,
     }
 
-    # Launch Arguments
-    declare_prefix = DeclareLaunchArgument(
-        'prefix',
-        default_value='',
-        description='Prefix of the joint and link names.',
-    )
-
-    declare_use_gazebo = DeclareLaunchArgument(
-        'use_gazebo',
-        default_value='false',
-        description='Use Gazebo Sim ros2_control hardware.',
-    )
-
-    declare_use_fake_hardware = DeclareLaunchArgument(
-        'use_fake_hardware',
-        default_value='false',
-        description='Use fake ros2_control hardware.',
-    )
-
-    declare_fake_sensor_commands = DeclareLaunchArgument(
-        'fake_sensor_commands',
-        default_value='false',
-        description='Enable fake command interfaces for sensors.',
-    )
-
-    declare_use_sim_time = DeclareLaunchArgument(
-        'use_sim_time',
-        default_value='false',
-        description='Use simulation clock if true.',
-    )
-
-    ld.add_action(declare_prefix)
-    ld.add_action(declare_use_gazebo)
-    ld.add_action(declare_use_fake_hardware)
-    ld.add_action(declare_fake_sensor_commands)
-    ld.add_action(declare_use_sim_time)
-
     # Move Group
-    move_group_node = Node(
-        package='moveit_ros_move_group',
-        executable='move_group',
-        output='screen',
-        parameters=[
-            robot_description,
-            robot_description_semantic,
-            robot_description_kinematics,
-            robot_description_planning,
-            ompl_planning_pipeline_config,
-            trajectory_execution,
-            moveit_controllers,
-            planning_scene_monitor_parameters,
-            occupancy_map_monitor_parameters,
-            {'use_sim_time': use_sim_time},
-        ],
+    move_group = OpaqueFunction(
+        function=launch_move_group,
+        kwargs={
+            'robot_description': robot_description,
+            'robot_description_semantic': robot_description_semantic,
+            'robot_description_kinematics': robot_description_kinematics,
+            'robot_description_planning': robot_description_planning,
+            'ompl_planning_pipeline_config': ompl_planning_pipeline_config,
+            'trajectory_execution': trajectory_execution,
+            'moveit_controllers': moveit_controllers,
+            'planning_scene_monitor_parameters': planning_scene_monitor_parameters,
+            'occupancy_map_monitor_parameters': occupancy_map_monitor_parameters,
+            'use_sim_time': use_sim_time,
+        },
     )
-    ld.add_action(move_group_node)
+
+    ld.add_action(move_group)
 
     return ld

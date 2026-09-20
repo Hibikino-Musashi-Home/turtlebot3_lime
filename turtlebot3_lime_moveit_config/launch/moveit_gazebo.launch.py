@@ -20,6 +20,7 @@
 #   - Add prefix and use_rviz arguments and make the RViz launch conditional.
 #   - Pass Gazebo hardware and simulation clock settings to RViz and move_group.
 #   - Remove the embedded Gazebo bringup and world configuration.
+#   - Add an option to enable or disable the occupancy map monitor.
 # Modified Maintainers: Fujino Tomoaki
 
 from launch import LaunchDescription
@@ -39,6 +40,7 @@ def generate_launch_description():
     # Launch Configurations
     prefix = LaunchConfiguration('prefix')
     use_rviz = LaunchConfiguration('use_rviz')
+    use_occupancy_map_monitor = LaunchConfiguration('use_occupancy_map_monitor')
 
     # Launch Arguments
     declare_prefix = DeclareLaunchArgument(
@@ -53,8 +55,15 @@ def generate_launch_description():
         description='Whether to execute RViz2.',
     )
 
-    ld.add_action(declare_use_rviz)
+    declare_use_occupancy_map_monitor = DeclareLaunchArgument(
+        'use_occupancy_map_monitor',
+        default_value='false',
+        description='Enable the MoveIt occupancy map monitor.',
+    )
+
     ld.add_action(declare_prefix)
+    ld.add_action(declare_use_rviz)
+    ld.add_action(declare_use_occupancy_map_monitor)
 
     # RViz
     rviz_launch = IncludeLaunchDescription(
@@ -78,6 +87,7 @@ def generate_launch_description():
             'use_gazebo': 'true',
             'use_fake_hardware': 'false',
             'fake_sensor_commands': 'false',
+            'use_occupancy_map_monitor': use_occupancy_map_monitor,
             'use_sim_time': 'true',
         }.items(),
     )

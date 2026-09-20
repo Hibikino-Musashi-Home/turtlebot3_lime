@@ -129,6 +129,7 @@ int KeyboardServo::keyLoop() {
 
     RCLCPP_INFO(nh_->get_logger(), "====== command ======\n\n");
 
+    bool command_output_visible = false;
     bool servoing = true;
     while (servoing) {
         // get the next event from the keyboard
@@ -139,8 +140,13 @@ int KeyboardServo::keyLoop() {
             return -1;
         }
 
-        RCLCPP_INFO(nh_->get_logger(), "\x1b[999D\x1b[0K\x1b[3A");
+        if (command_output_visible) {
+            fputs("\x1b[2A\x1b[J", stderr);
+            fflush(stderr);
+        }
+
         RCLCPP_INFO(nh_->get_logger(), "input:[%c] value: 0x%02X", c, c);
+        command_output_visible = true;
 
         switch (c) {
             // Command Control Keys

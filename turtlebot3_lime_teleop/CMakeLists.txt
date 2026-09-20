@@ -19,9 +19,6 @@ find_package(control_msgs REQUIRED)
 find_package(sensor_msgs REQUIRED)
 find_package(std_srvs REQUIRED)
 find_package(rclcpp_action REQUIRED)
-find_package(turtlebot3_lime_bringup REQUIRED)
-find_package(turtlebot3_lime_moveit_config REQUIRED)
-find_package(turtlebot3_lime_description REQUIRED)
 
 # ROS 2 distribution
 if("$ENV{ROS_DISTRO}" STREQUAL "humble")
@@ -50,9 +47,6 @@ target_include_directories(turtlebot3_lime_teleop PUBLIC
 ament_target_dependencies(
   turtlebot3_lime_teleop
   "rclcpp"
-  "turtlebot3_lime_bringup"
-  "turtlebot3_lime_moveit_config"
-  "turtlebot3_lime_description"
   "geometry_msgs"
   "nav_msgs"
   "control_msgs"

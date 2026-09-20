@@ -13,17 +13,14 @@
 
   <buildtool_depend>ament_cmake</buildtool_depend>
 
-  <depend>rclcpp</depend>
-  <depend>turtlebot3_lime_bringup</depend>
-  <depend>turtlebot3_lime_moveit_config</depend>
-  <depend>turtlebot3_lime_description</depend>
-  <depend>geometry_msgs</depend>
-  <depend>nav_msgs</depend>
   <depend>control_msgs</depend>
-  <depend condition="$ROS_DISTRO != humble">moveit_msgs</depend>
+  <depend>geometry_msgs</depend>
+  <depend condition="$ROS_DISTRO != 'humble'">moveit_msgs</depend>
+  <depend>nav_msgs</depend>
+  <depend>rclcpp</depend>
+  <depend>rclcpp_action</depend>
   <depend>sensor_msgs</depend>
   <depend>std_srvs</depend>
-  <depend>rclcpp_action</depend>
 
   <test_depend>ament_lint_auto</test_depend>
   <test_depend>ament_lint_common</test_depend>

@@ -121,6 +121,21 @@ def generate_launch_description():
         output='screen',
     )
 
+    # Start ros_gz_image_bridge
+    start_gazebo_ros_image_bridge_cmd = Node(
+        package='ros_gz_image',
+        executable='image_bridge',
+        arguments=[
+            '/camera/camera/color/image_raw',
+            '/camera/camera/aligned_depth_to_color/image_raw',
+        ],
+        parameters=[
+            {'qos': 'sensor_data'},
+            {'lazy': True},
+        ],
+        output='screen',
+    )
+
     # Start ros2_control controller spawners
     start_controller_spawner_cmd = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
@@ -156,6 +171,7 @@ def generate_launch_description():
     # Add the actions
     ld.add_action(start_gazebo_ros_spawner_cmd)
     ld.add_action(start_gazebo_ros_bridge_cmd)
+    ld.add_action(start_gazebo_ros_image_bridge_cmd)
     ld.add_action(start_controllers)
 
     return ld

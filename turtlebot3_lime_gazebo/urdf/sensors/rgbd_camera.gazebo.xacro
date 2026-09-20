@@ -17,10 +17,18 @@
             <height>480</height>
             <format>RGB_INT8</format>
           </image>
+          <!-- RGB rendering range -->
           <clip>
-            <near>0.2</near>
-            <far>10.0</far>
+            <near>0.01</near>
+            <far>100.0</far>
           </clip>
+          <!-- Depth measurement range -->
+          <depth_camera>
+            <clip>
+              <near>0.2</near>
+              <far>10.0</far>
+            </clip>
+          </depth_camera>
           <noise>
             <type>gaussian</type>
             <mean>0.0</mean>

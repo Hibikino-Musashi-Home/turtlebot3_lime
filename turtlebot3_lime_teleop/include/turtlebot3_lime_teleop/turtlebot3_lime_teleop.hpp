@@ -59,7 +59,7 @@ const double BASE_LINEAR_VEL_STEP = 0.02;  // m/s
 
 const double BASE_ANGULAR_VEL_MAX = 3.28;  // rad/s
 const double BASE_ANGULAR_VEL_STEP = 0.2;  // rad/s
-const char BASE_FRAME_ID[] = "link0";
+const char BASE_FRAME_ID[] = "base_link";
 
 const double ARM_JOINT_VEL = 1.0;  // rad/s
 

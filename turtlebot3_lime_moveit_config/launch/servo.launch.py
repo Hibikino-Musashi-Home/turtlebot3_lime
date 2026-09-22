@@ -134,7 +134,9 @@ def generate_launch_description():
         'kinematics.yaml',
     )
     with open(kinematics_yaml_path, 'r') as file:
-        kinematics_yaml = yaml.safe_load(file)
+        robot_description_kinematics = {
+            'robot_description_kinematics': yaml.safe_load(file)
+        }
 
     # Get parameters for the Servo node
     servo_yaml_path = os.path.join(
@@ -162,7 +164,7 @@ def generate_launch_description():
             servo_params,
             robot_description,
             robot_description_semantic,
-            kinematics_yaml,
+            robot_description_kinematics,
         ],
     )
     ld.add_action(servo_node)

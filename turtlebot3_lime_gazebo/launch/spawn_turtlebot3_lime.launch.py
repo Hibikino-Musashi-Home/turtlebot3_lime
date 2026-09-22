@@ -126,8 +126,12 @@ def generate_launch_description():
         package='ros_gz_image',
         executable='image_bridge',
         arguments=[
-            '/camera/camera/color/image_raw',
-            '/camera/camera/aligned_depth_to_color/image_raw',
+            '/camera/image',
+            '/camera/depth_image',
+        ],
+        remappings=[
+            ('/camera/image', '/camera/camera/color/image_raw'),
+            ('/camera/depth_image', '/camera/camera/aligned_depth_to_color/image_raw'),
         ],
         parameters=[
             {'qos': 'sensor_data'},

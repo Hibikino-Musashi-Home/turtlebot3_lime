@@ -418,7 +418,7 @@ source ~/.bashrc
      **[Remote PC]**
 
      ```bash
-     ros2 run turtlebot3_lime_teleop turtlebot3_lime_teleop
+     ros2 run turtlebot3_lime_teleop teleop_keyboard
      ```
 
    キーボードから以下の操作ができます．
@@ -682,7 +682,7 @@ ros2 launch turtlebot3_lime_cartographer cartographer.launch.py use_sim_time:=tr
 テレオペを実行します．Gazebo では Servo と同じシミュレーション時刻を使うため，`use_sim_time:=true` を指定します．時刻が一致しないと，アーム指令のタイムアウトが正常に判定されません．
 
 ```bash
-ros2 run turtlebot3_lime_teleop turtlebot3_lime_teleop --ros-args -p use_sim_time:=true
+ros2 run turtlebot3_lime_teleop teleop_keyboard --ros-args -p use_sim_time:=true
 ```
 
 キーボードから以下の操作ができます．

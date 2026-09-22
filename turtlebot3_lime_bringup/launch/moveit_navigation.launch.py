@@ -37,6 +37,7 @@ def generate_launch_description():
 
     use_rviz = LaunchConfiguration('use_rviz')
     use_gazebo = LaunchConfiguration('use_gazebo')
+    use_occupancy_map_monitor = LaunchConfiguration('use_occupancy_map_monitor')
     use_sim_time = LaunchConfiguration('use_sim_time')
 
     declare_use_rviz = DeclareLaunchArgument(
@@ -51,6 +52,12 @@ def generate_launch_description():
         description='Use Gazebo simulation if true.',
     )
 
+    declare_use_occupancy_map_monitor = DeclareLaunchArgument(
+        'use_occupancy_map_monitor',
+        default_value='false',
+        description='Enable the MoveIt occupancy map monitor.',
+    )
+
     declare_use_sim_time = DeclareLaunchArgument(
         'use_sim_time',
         default_value='false',
@@ -60,6 +67,7 @@ def generate_launch_description():
     ld.add_action(declare_use_rviz)
     ld.add_action(declare_use_gazebo)
     ld.add_action(declare_use_sim_time)
+    ld.add_action(declare_use_occupancy_map_monitor)
 
     # Moveit 2 RViz
     moveit_launch_dir = PathJoinSubstitution(
@@ -82,6 +90,7 @@ def generate_launch_description():
             'use_gazebo': use_gazebo,
             'use_fake_hardware': 'false',
             'fake_sensor_commands': 'false',
+            'use_occupancy_map_monitor': use_occupancy_map_monitor,
             'use_sim_time': use_sim_time,
         }.items(),
     )

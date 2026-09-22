@@ -18,6 +18,7 @@
 // Modified Contents: Number of axes changed to 6 axes
 // Modified Authors: Masaya Shoji, Keisuke Nagashima
 // Modified Contents:
+//   Renamed turtlebot3_lime_teleop.cpp/.hpp to teleop_keyboard.cpp/.hpp
 //   Added ROS 2 Humble and Jazzy support for MoveIt Servo and keyboard auto-repeat handling
 //   for continuous arm joint control
 // Modified Authors: Tomoaki Fujino
@@ -25,7 +26,7 @@
 #include <algorithm>
 #include <memory>
 
-#include "turtlebot3_lime_teleop/turtlebot3_lime_teleop.hpp"
+#include "turtlebot3_lime_teleop/teleop_keyboard.hpp"
 
 // KeyboardReader
 KeyboardReader::KeyboardReader()
@@ -57,7 +58,7 @@ void KeyboardReader::shutdown() {
 KeyboardServo::KeyboardServo()
     : publish_joint_(false),
       joint_key_repeating_(false) {
-    nh_ = rclcpp::Node::make_shared("servo_keyboard_input");
+    nh_ = rclcpp::Node::make_shared("teleop_keyboard");
 
 #ifdef ROS_DISTRO_HUMBLE
     servo_start_client_ =

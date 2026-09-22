@@ -27,25 +27,25 @@ else()
   find_package(moveit_msgs REQUIRED)
 endif()
 
-add_executable(turtlebot3_lime_teleop src/turtlebot3_lime_teleop.cpp)
+add_executable(teleop_keyboard src/teleop_keyboard.cpp)
 
 if(ROS_DISTRO_HUMBLE)
   target_compile_definitions(
-    turtlebot3_lime_teleop PRIVATE ROS_DISTRO_HUMBLE
+    teleop_keyboard PRIVATE ROS_DISTRO_HUMBLE
   )
 else()
   target_compile_definitions(
-    turtlebot3_lime_teleop PRIVATE ROS_DISTRO_JAZZY_OR_LATER
+    teleop_keyboard PRIVATE ROS_DISTRO_JAZZY_OR_LATER
   )
 endif()
 
-target_include_directories(turtlebot3_lime_teleop PUBLIC
+target_include_directories(teleop_keyboard PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include>
 )
 
 ament_target_dependencies(
-  turtlebot3_lime_teleop
+  teleop_keyboard
   "rclcpp"
   "geometry_msgs"
   "nav_msgs"
@@ -57,12 +57,12 @@ ament_target_dependencies(
 
 if(NOT ROS_DISTRO_HUMBLE)
   ament_target_dependencies(
-    turtlebot3_lime_teleop
+    teleop_keyboard
     "moveit_msgs"
   )
 endif()
 
-install(TARGETS turtlebot3_lime_teleop
+install(TARGETS teleop_keyboard
   DESTINATION lib/${PROJECT_NAME}
 )
 

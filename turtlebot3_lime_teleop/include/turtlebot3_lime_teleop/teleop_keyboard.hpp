@@ -1,5 +1,5 @@
-#ifndef TURTLEBOT3_LIME_TELEOP__TURTLEBOT3_LIME_TELEOP_HPP_
-#define TURTLEBOT3_LIME_TELEOP__TURTLEBOT3_LIME_TELEOP_HPP_
+#ifndef TURTLEBOT3_LIME_TELEOP__TELEOP_KEYBOARD_HPP_
+#define TURTLEBOT3_LIME_TELEOP__TELEOP_KEYBOARD_HPP_
 
 #include <rclcpp/rclcpp.hpp>
 #include <rclcpp_action/rclcpp_action.hpp>
@@ -166,4 +166,4 @@ int main(int argc, char ** argv)
   return rc;
 }
 
-#endif  // TURTLEBOT3_LIME_TELEOP__TURTLEBOT3_LIME_TELEOP_HPP_
+#endif  // TURTLEBOT3_LIME_TELEOP__TELEOP_KEYBOARD_HPP_
